@@ -447,8 +447,8 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 22px;
-    padding: 16px 8px;
+    gap: 12px;
+    padding: 14px 6px;
     margin: 8px 0;
     border-radius: 22px;
     background: rgba(0, 0, 0, 0.22);
@@ -457,13 +457,13 @@
   .pool-label { color: var(--muted); font-size: 1rem; margin-top: 10px; }
 
   .tile {
-    width: clamp(92px, 28vw, 120px);
-    height: clamp(92px, 28vw, 110px);
+    width: clamp(78px, 23vw, 110px);
+    height: clamp(78px, 23vw, 100px);
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(2rem, 9vw, 2.6rem);
+    font-size: clamp(1.7rem, 7.5vw, 2.4rem);
     font-weight: bold;
     color: #24204f;
     background: linear-gradient(180deg, #fff6c9, var(--yellow));
@@ -477,7 +477,13 @@
   }
   .tile:nth-child(3n+2) { background: linear-gradient(180deg, #d4f6ff, var(--cyan)); box-shadow: 0 7px 0 #1a95b3, 0 12px 18px rgba(0,0,0,.35); }
   .tile:nth-child(3n+3) { background: linear-gradient(180deg, #ffd6e4, var(--pink)); box-shadow: 0 7px 0 #b8295a, 0 12px 18px rgba(0,0,0,.35); }
-  .slot .tile { width: 100%; height: 100%; transform: none !important; box-shadow: 0 4px 0 rgba(0,0,0,.25); }
+  .slot .tile { width: 100%; height: 100%; transform: none !important; box-shadow: 0 4px 0 rgba(0,0,0,.25); font-size: clamp(2rem, 9vw, 2.6rem); cursor: pointer; }
+  .tile.rejected {
+    z-index: 50;
+    color: #fff;
+    background: linear-gradient(180deg, #ff9aa4, var(--red));
+    box-shadow: 0 7px 0 #8a0f22, 0 0 18px rgba(255, 77, 94, 0.8);
+  }
   .tile.dragging {
     position: fixed;
     z-index: 100;
@@ -869,7 +875,7 @@
   <section id="fasa3" class="phase">
     <div class="panel">
       <h2>🧩 Bina Perkataan</h2>
-      <p class="sub">Seret suku kata ke dalam kotak mengikut susunan yang betul. Tekan suku kata untuk mendengar bunyinya.</p>
+      <p class="sub">Seret suku kata yang betul ke dalam kotak. Hati-hati, ada suku kata perangkap! Tekan suku kata untuk mendengar bunyinya.</p>
       <div class="hint-icon" id="hintIcon" title="Dengar perkataan"></div>
       <div class="slots" id="slots"></div>
       <div class="formed-word hidden" id="formedWord" title="Dengar perkataan"></div>
@@ -1477,21 +1483,29 @@ $("#btnSeterusnya").addEventListener("click", () => { sfx.click(); showPhase(3);
    ===================================================================== */
 const slotsEl = $("#slots");
 const poolEl = $("#pool");
+const JUMLAH_DISTRAKTOR = 4; // bilangan suku kata pengganggu dari perkataan lain
 let phase3Locked = false;
 let drag = null;
 
-function shuffleNotSame(arr) {
+function shuffle(arr) {
   const a = arr.slice();
-  if (a.length < 2) return a;
-  let tries = 0;
-  do {
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    tries++;
-  } while (a.every((v, i) => v === arr[i]) && tries < 20);
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
   return a;
+}
+
+/* Pilih suku kata rawak daripada perkataan LAIN dalam senarai sebagai distraktor.
+   Suku kata yang sama dengan suku kata sasaran (cth "bu" dalam Buku/Burung) dikecualikan. */
+function pickDistractors(target, n) {
+  const exclude = new Set(target.syl);
+  const calon = new Set();
+  SENARAI_PERKATAAN.forEach((item) => {
+    if (item.word === target.word) return;
+    item.syl.forEach((s) => { if (!exclude.has(s)) calon.add(s); });
+  });
+  return shuffle(Array.from(calon)).slice(0, n);
 }
 
 function makeTile(syl) {
@@ -1507,7 +1521,7 @@ function makeTile(syl) {
 }
 
 function scatter(tile) {
-  tile.style.transform = `rotate(${rand(-12, 12).toFixed(1)}deg) translateY(${rand(-10, 10).toFixed(0)}px)`;
+  tile.style.transform = `rotate(${rand(-12, 12).toFixed(1)}deg) translateY(${rand(-8, 8).toFixed(0)}px)`;
 }
 
 function enterPhase3() {
@@ -1520,15 +1534,17 @@ function enterPhase3() {
   setFeedback("", "");
   renderIcon($("#hintIcon"), w.word);
 
-  w.syl.forEach((_, i) => {
+  w.syl.forEach((syl, i) => {
     const s = document.createElement("div");
     s.className = "slot";
     s.dataset.index = i;
     s.dataset.num = i + 1;
+    s.dataset.expect = syl; // kotak ini hanya menerima suku kata ini
     slotsEl.appendChild(s);
   });
 
-  shuffleNotSame(w.syl).forEach((syl) => {
+  // Suku kata sasaran + distraktor, disusun secara rawak
+  shuffle(w.syl.concat(pickDistractors(w, JUMLAH_DISTRAKTOR))).forEach((syl) => {
     const t = makeTile(syl);
     scatter(t);
     poolEl.appendChild(t);
@@ -1542,7 +1558,7 @@ function setFeedback(text, cls) {
 }
 
 function onTileDown(e) {
-  if (phase3Locked || drag) return;
+  if (drag) return;
   if (e.pointerType === "mouse" && e.button !== 0) return;
   e.preventDefault();
   getAudioCtx();
@@ -1558,6 +1574,9 @@ function onTileDown(e) {
     w: rect.width,
     h: rect.height,
     moved: false,
+    // Jubin yang sudah betul dalam kotak jawapan (atau fasa sudah selesai)
+    // hanya boleh diketik untuk mendengar bunyi, tidak boleh diseret.
+    tapOnly: phase3Locked || tile.parentNode !== poolEl,
     ghost: null
   };
   try { tile.setPointerCapture(e.pointerId); } catch (err) {}
@@ -1571,6 +1590,8 @@ function startDragVisual() {
   ghost.style.height = h + "px";
   tile.parentNode.insertBefore(ghost, tile);
   drag.ghost = ghost;
+  tile.classList.remove("rejected");
+  tile.style.transition = "";
   tile.classList.add("dragging");
   tile.style.width = w + "px";
   tile.style.height = h + "px";
@@ -1592,7 +1613,7 @@ function slotUnder(x, y) {
 }
 
 document.addEventListener("pointermove", (e) => {
-  if (!drag || e.pointerId !== drag.id) return;
+  if (!drag || e.pointerId !== drag.id || drag.tapOnly) return;
   e.preventDefault();
   const dx = e.clientX - drag.startX;
   const dy = e.clientY - drag.startY;
@@ -1619,7 +1640,7 @@ function endDrag(e, cancelled) {
   $$(".slot").forEach((s) => s.classList.remove("hover"));
 
   if (!d.moved) {
-    // Ketikan biasa: mainkan audio suku kata
+    // Ketikan biasa: mainkan audio suku kata (termasuk distraktor)
     if (!cancelled) {
       playAudio(tile.dataset.syl);
       restartAnim(tile, "playing");
@@ -1630,78 +1651,96 @@ function endDrag(e, cancelled) {
   const cx = e.clientX - d.offX + d.w / 2;
   const cy = e.clientY - d.offY + d.h / 2;
   const target = cancelled ? null : slotUnder(cx, cy);
+  const dropRect = tile.getBoundingClientRect();
 
   tile.classList.remove("dragging");
   tile.style.left = tile.style.top = tile.style.width = tile.style.height = "";
-  const ghost = d.ghost;
 
-  if (target) {
+  if (target && slotAccepts(target, tile)) {
+    if (d.ghost) d.ghost.remove();
     placeInSlot(tile, target);
-    if (ghost) ghost.remove();
   } else {
-    // Kembali ke tempat asal (dalam kotak pool atau slot asal)
-    if (ghost && ghost.parentNode) {
-      ghost.parentNode.insertBefore(tile, ghost);
-      ghost.remove();
-    }
-    if (tile.parentNode === poolEl) scatter(tile);
+    bounceBack(tile, d.ghost, dropRect, !!target);
+    if (target) rejectFeedback(tile, target);
   }
 }
 
 document.addEventListener("pointerup", (e) => endDrag(e, false));
 document.addEventListener("pointercancel", (e) => endDrag(e, true));
 
-function returnToPool(tile) {
-  tile.textContent = tile.dataset.syl;
-  poolEl.appendChild(tile);
+/* Kotak jawapan hanya menerima suku kata yang betul bagi kedudukannya */
+function slotAccepts(slot, tile) {
+  return !slot.querySelector(".tile") && tile.dataset.syl === slot.dataset.expect;
+}
+
+/* Lantun jubin semula ke tempat asalnya dalam kotak pilihan */
+function bounceBack(tile, ghost, fromRect, isReject) {
+  if (ghost && ghost.parentNode) {
+    ghost.parentNode.insertBefore(tile, ghost);
+    ghost.remove();
+  } else {
+    poolEl.appendChild(tile);
+  }
   scatter(tile);
+  const finalTransform = tile.style.transform;
+  const to = tile.getBoundingClientRect();
+  tile.style.transition = "none";
+  tile.style.transform = `translate(${fromRect.left - to.left}px, ${fromRect.top - to.top}px) ${finalTransform}`;
+  void tile.offsetWidth;
+  tile.style.transition = "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
+  tile.style.transform = finalTransform;
+  if (isReject) {
+    restartAnim(tile, "rejected");
+    setTimeout(() => tile.classList.remove("rejected"), 900);
+  }
+  setTimeout(() => { tile.style.transition = ""; }, 520);
+}
+
+function rejectFeedback(tile, slot) {
+  const syl = tile.dataset.syl;
+  restartAnim(slot, "wrong");
+  setTimeout(() => slot.classList.remove("wrong"), 600);
+  sfx.salah();
+  if (state.current.syl.includes(syl)) {
+    setFeedback(`Hampir! “${syl}” betul, tetapi cuba letak di kotak lain. 😉`, "bad");
+  } else {
+    setFeedback(`Ups! “${syl}” bukan suku kata perkataan ini. Cuba lagi! 💪`, "bad");
+  }
 }
 
 function placeInSlot(tile, slot) {
-  const existing = slot.querySelector(".tile");
-  if (existing && existing !== tile) returnToPool(existing);
   tile.style.transform = "";
+  tile.style.transition = "";
   slot.appendChild(tile);
+  slot.classList.add("correct");
   sfx.click();
-  if (!checkWord()) playAudio(tile.dataset.syl);
+  if (!checkWord()) {
+    playAudio(tile.dataset.syl);
+    setFeedback("Betul! 👍 Teruskan.", "ok");
+  }
 }
 
 function checkWord() {
   const slots = $$(".slot");
   const tiles = slots.map((s) => s.querySelector(".tile"));
-  if (tiles.some((t) => !t)) { setFeedback("", ""); return false; }
+  if (tiles.some((t) => !t)) return false;
 
+  // Semua kotak telah diisi dengan suku kata yang betul
   const built = tiles.map((t) => t.dataset.syl).join("");
-  const target = state.current.word.toLowerCase();
-
-  if (built === target) {
-    phase3Locked = true;
-    slots.forEach((s) => s.classList.add("correct"));
-    // Huruf pertama perkataan lengkap ditukar kepada huruf besar secara automatik
-    tiles[0].textContent = capitalize(tiles[0].dataset.syl);
-    const fw = $("#formedWord");
-    fw.textContent = capitalize(built) + " 🔊";
-    fw.classList.remove("hidden");
-    restartAnim(fw, "pop-in");
-    setFeedback("Bagus! Anda berjaya membina perkataan! 🌟", "ok");
-    sfx.berjaya();
-    playAudio(state.current.word);
-    const bu = $("#btnUji");
-    bu.classList.remove("hidden");
-    restartAnim(bu, "pop-in");
-    return true;
-  } else {
-    slots.forEach((s) => restartAnim(s, "wrong"));
-    setFeedback("Hmm, susunan belum betul. Cuba lagi! 💪", "bad");
-    sfx.salah();
-    phase3Locked = true;
-    setTimeout(() => {
-      slots.forEach((s) => s.classList.remove("wrong"));
-      tiles.forEach(returnToPool);
-      phase3Locked = false;
-    }, 1000);
-    return false;
-  }
+  phase3Locked = true;
+  // Huruf pertama perkataan lengkap ditukar kepada huruf besar secara automatik
+  tiles[0].textContent = capitalize(tiles[0].dataset.syl);
+  const fw = $("#formedWord");
+  fw.textContent = capitalize(built) + " 🔊";
+  fw.classList.remove("hidden");
+  restartAnim(fw, "pop-in");
+  setFeedback("Bagus! Anda berjaya membina perkataan! 🌟", "ok");
+  sfx.berjaya();
+  playAudio(state.current.word);
+  const bu = $("#btnUji");
+  bu.classList.remove("hidden");
+  restartAnim(bu, "pop-in");
+  return true;
 }
 
 $("#hintIcon").addEventListener("click", () => state.current && playAudio(state.current.word));
