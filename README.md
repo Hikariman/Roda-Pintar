@@ -10,7 +10,7 @@ Seluruh permainan berada dalam **satu fail**: `index.html` (HTML + CSS + JavaScr
 4. **Misi Sebutan** – tekan butang mikrofon dan sebut perkataan untuk membawa roket melepasi halangan (+10 markah).
 
 ## Audio sendiri
-Letakkan fail `.mp3` dalam folder `audio/` dan sunting objek `audioMap` di bahagian atas `<script>` dalam `index.html`.
+Fail audio (format `.m4a`) berada dalam folder `audio/` dan sunting objek `audioMap` di bahagian atas `<script>` dalam `index.html`.
 Kesan bunyi juga boleh ditukar melalui `sfxMap`, dan ikon/gambar melalui `iconMap`.
 
 ## Penting untuk pengecaman suara
