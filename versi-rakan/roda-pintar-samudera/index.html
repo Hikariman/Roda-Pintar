@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#03203a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Roda Pintar Samudera</title>
+<style>
+  :root {
+    --bg1: #03203a;
+    --bg2: #0a4f80;
+    --panel: rgba(4, 32, 62, 0.85);
+    --panel-border: rgba(255, 255, 255, 0.16);
+    --text: #ffffff;
+    --muted: #cbe9ff;
+    --yellow: #ffd23f;
+    --orange: #ff9f1c;
+    --pink: #ff5d8f;
+    --cyan: #3ddcff;
+    --green: #3ee08f;
+    --red: #ff4d5e;
+    --purple: #8b5cf6;
+    --blue: #4f7cff;
+    --font: "Comic Sans MS", "Chalkboard SE", "Comic Neue", "Baloo 2", "Nunito", "Trebuchet MS", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: var(--font);
+    color: var(--text);
+    background: radial-gradient(ellipse at 50% -10%, rgba(120, 210, 255, 0.35) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 100%, #052b4d 0%, transparent 60%),
+                linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 100%);
+    background-color: var(--bg1);
+    background-attachment: fixed;
+    min-height: 100vh;
+    min-height: 100dvh;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  input { -webkit-user-select: text; user-select: text; }
+
+  button { font-family: inherit; touch-action: manipulation; }
+
+  .hidden { display: none !important; }
+  .invisible { visibility: hidden; }
+
+  /* ================= LATAR DASAR LAUT ================= */
+  #space {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  /* Gelembung udara (dijana oleh JavaScript) */
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.65);
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.08) 60%);
+    opacity: 0;
+    animation: bubble 10s linear infinite;
+  }
+  @keyframes bubble {
+    0%   { opacity: 0; transform: translate(0, 0); }
+    10%  { opacity: 0.85; }
+    50%  { transform: translate(10px, -30vh); }
+    100% { opacity: 0; transform: translate(-6px, -60vh); }
+  }
+
+  .rays {
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 75%;
+    background: repeating-linear-gradient(105deg, rgba(255, 255, 255, 0.08) 0 50px, transparent 50px 140px);
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent);
+    mask-image: linear-gradient(180deg, #000, transparent);
+    animation: rays 8s ease-in-out infinite alternate;
+  }
+  @keyframes rays {
+    from { opacity: 0.5; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(20px); }
+  }
+
+  .sand {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 60px;
+    background: linear-gradient(180deg, transparent, rgba(212, 176, 122, 0.55) 60%);
+  }
+
+  .seaweed {
+    position: absolute;
+    bottom: -6px;
+    width: 70px;
+    transform-origin: bottom center;
+    animation: sway 4s ease-in-out infinite alternate;
+  }
+  .seaweed svg { width: 100%; height: 100%; display: block; }
+  .seaweed.s1 { left: 1%; height: 34vh; }
+  .seaweed.s2 { left: 11%; height: 22vh; animation-duration: 5s; }
+  .seaweed.s3 { right: 3%; height: 28vh; animation-duration: 4.6s; }
+  @keyframes sway { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+
+  .coral { position: absolute; bottom: -4px; right: 18%; width: 120px; }
+
+  .fish {
+    position: absolute;
+    width: 90px;
+    left: -130px;
+    top: 22%;
+    animation: swimR 15s linear infinite;
+  }
+  @keyframes swimR {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(27vw, 3vh); }
+    50%  { transform: translate(54vw, -2vh); }
+    75%  { transform: translate(80vw, 2vh); }
+    100% { transform: translate(calc(100vw + 240px), 0); }
+  }
+  .fish2 {
+    position: absolute;
+    width: 60px;
+    right: -100px;
+    top: 46%;
+    opacity: 0.8;
+    animation: swimL 21s linear infinite;
+    animation-delay: 5s;
+  }
+  @keyframes swimL {
+    0%   { transform: translate(0, 0) scaleX(-1); }
+    50%  { transform: translate(-55vw, -5vh) scaleX(-1); }
+    100% { transform: translate(calc(-100vw - 200px), 0) scaleX(-1); }
+  }
+
+  .turtle-path {
+    position: absolute;
+    top: 60%;
+    left: 0;
+    animation: turtleDrift 30s ease-in-out infinite alternate;
+  }
+  @keyframes turtleDrift {
+    0%   { transform: translate(-12vw, -6vh); }
+    50%  { transform: translate(40vw, 10vh); }
+    100% { transform: translate(85vw, -20vh); }
+  }
+  .turtle { width: 100px; animation: turtleBob 5s ease-in-out infinite; }
+  @keyframes turtleBob {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50% { transform: translateY(-16px) rotate(6deg); }
+  }
+
+  .jelly {
+    position: absolute;
+    right: 10%;
+    top: 26%;
+    width: 52px;
+    opacity: 0.85;
+    animation: jelly 6s ease-in-out infinite;
+  }
+  @keyframes jelly {
+    0%, 100% { transform: translateY(0) scaleY(1); }
+    25% { transform: translateY(-20px) scaleY(0.88); }
+    50% { transform: translateY(-34px) scaleY(1.05); }
+  }
+
+  @keyframes astroFloat {
+    0%, 100% { transform: translateY(0) rotate(-12deg); }
+    50% { transform: translateY(-22px) rotate(14deg); }
+  }
+
+  .fin-tail { transform-box: fill-box; transform-origin: right center; animation: tailWag 0.3s ease-in-out infinite alternate; }
+  @keyframes tailWag { from { transform: scaleY(1); } to { transform: scaleY(0.6); } }
+  .prop { transform-box: fill-box; transform-origin: center; animation: prop 0.12s linear infinite alternate; }
+  @keyframes prop { from { transform: scaleY(1); } to { transform: scaleY(0.2); } }
+
+  .flame { transform-box: fill-box; transform-origin: right center; animation: flicker 0.12s ease-in-out infinite alternate; }
+  @keyframes flicker {
+    from { transform: scaleX(0.75); opacity: 0.85; }
+    to   { transform: scaleX(1.15); opacity: 1; }
+  }
+
+  /* ================= HUD ================= */
+  #hud {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    padding-top: max(10px, env(safe-area-inset-top));
+    background: rgba(10, 12, 40, 0.75);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-bottom: 2px solid var(--panel-border);
+  }
+  .hud-player {
+    font-size: 1rem;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .hud-player small { color: var(--muted); font-weight: normal; }
+  .score-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    color: #3b2300;
+    font-weight: bold;
+    font-size: 1.15rem;
+    padding: 6px 14px;
+    border-radius: 999px;
+    box-shadow: 0 3px 0 #b86a00;
+  }
+  .bump { animation: bump 0.6s ease; }
+  @keyframes bump {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.45) rotate(-6deg); }
+    60% { transform: scale(0.9) rotate(4deg); }
+    100% { transform: scale(1); }
+  }
+
+  /* ================= FASA ================= */
+  main { position: relative; z-index: 1; }
+
+  .phase {
+    display: none;
+    min-height: calc(100vh - 60px);
+    min-height: calc(100dvh - 60px);
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  .phase.active { display: flex; animation: phaseIn 0.45s ease; }
+  #fasa1 { min-height: 100vh; min-height: 100dvh; }
+  @keyframes phaseIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .panel {
+    width: 100%;
+    max-width: 560px;
+    background: var(--panel);
+    border: 2px solid var(--panel-border);
+    border-radius: 26px;
+    padding: 22px 18px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  h1, h2 { margin: 0 0 8px; line-height: 1.15; }
+  h1 {
+    font-size: clamp(2rem, 9vw, 3rem);
+    background: linear-gradient(90deg, var(--yellow), var(--pink), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+  }
+  h2 { font-size: clamp(1.4rem, 6vw, 2rem); color: var(--yellow); }
+  .sub { color: var(--muted); font-size: 1.1rem; margin: 0 0 18px; }
+
+  .hero-icon { font-size: 4rem; line-height: 1; margin-bottom: 6px; animation: astroFloat 4s ease-in-out infinite; display: inline-block; }
+
+  /* Borang */
+  .field { text-align: left; margin-bottom: 14px; }
+  .field label { display: block; font-size: 1.15rem; font-weight: bold; margin-bottom: 6px; color: var(--cyan); }
+  .field input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 1.3rem;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 3px solid transparent;
+    background: #ffffff;
+    color: #1a1a3a;
+    outline: none;
+  }
+  .field input:focus { border-color: var(--yellow); box-shadow: 0 0 0 4px rgba(255, 210, 63, 0.35); }
+  .error-msg { color: #ffb4bd; font-weight: bold; min-height: 1.4em; margin: 4px 0 10px; }
+
+  /* Butang */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 1.35rem;
+    font-weight: bold;
+    color: #fff;
+    padding: 16px 30px;
+    min-height: 60px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #6d8dff, var(--blue));
+    box-shadow: 0 6px 0 #2a47b8, 0 10px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.2s;
+    margin: 8px 4px;
+  }
+  .btn:active { transform: translateY(5px); box-shadow: 0 1px 0 #2a47b8, 0 4px 10px rgba(0, 0, 0, 0.3); }
+  .btn:disabled { filter: grayscale(0.8) brightness(0.8); cursor: not-allowed; }
+  .btn.green  { background: linear-gradient(180deg, #6ff0ad, #1fbf6c); box-shadow: 0 6px 0 #138a4c, 0 10px 20px rgba(0,0,0,.3); color: #053b1f; }
+  .btn.green:active { box-shadow: 0 1px 0 #138a4c; }
+  .btn.orange { background: linear-gradient(180deg, #ffc15c, var(--orange)); box-shadow: 0 6px 0 #b86a00, 0 10px 20px rgba(0,0,0,.3); color: #3b2300; }
+  .btn.orange:active { box-shadow: 0 1px 0 #b86a00; }
+  .btn.pink   { background: linear-gradient(180deg, #ff8fb1, var(--pink)); box-shadow: 0 6px 0 #b8295a, 0 10px 20px rgba(0,0,0,.3); }
+  .btn.pink:active { box-shadow: 0 1px 0 #b8295a; }
+  .btn.big { font-size: 1.6rem; padding: 18px 40px; min-height: 70px; }
+  .btn.wide { width: 100%; }
+
+  .pop-in { animation: popIn 0.5s cubic-bezier(.2, 1.6, .4, 1); }
+  @keyframes popIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .shake { animation: shake 0.5s ease; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-7px); }
+    80% { transform: translateX(7px); }
+  }
+
+  /* ================= FASA 2: RODA ================= */
+  .wheel-area {
+    position: relative;
+    width: min(86vw, 420px, 56vh);
+    aspect-ratio: 1 / 1;
+    margin: 6px auto 12px;
+  }
+  #wheel {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 0 6px rgba(255, 210, 63, 0.35), 0 0 40px rgba(61, 220, 255, 0.35);
+    will-change: transform;
+  }
+  .wheel-pointer {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translateX(-50%);
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 40px solid var(--red);
+    filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.5));
+    z-index: 3;
+    transform-origin: 50% 0;
+  }
+  .wheel-pointer::after {
+    content: "";
+    position: absolute;
+    left: -9px;
+    top: -36px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .wheel-pointer.tick { animation: tick 0.1s ease; }
+  @keyframes tick {
+    0% { transform: translateX(-50%) rotate(0); }
+    50% { transform: translateX(-50%) rotate(-14deg); }
+    100% { transform: translateX(-50%) rotate(0); }
+  }
+
+  .result-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 4px auto 6px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #24204f;
+    border-radius: 20px;
+    max-width: 340px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
+  }
+  .result-card .ri { font-size: 3rem; line-height: 1; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+  .result-card .rw { font-size: 2.3rem; font-weight: bold; }
+  .result-label { color: var(--muted); font-size: 1.1rem; margin-top: 4px; }
+
+  .icon-img, .icon-svg svg { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .icon-svg { width: 100%; height: 100%; }
+
+  /* ================= FASA 3: BINA PERKATAAN ================= */
+  .hint-icon {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 6px;
+    font-size: 4.2rem;
+    line-height: 90px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.25);
+  }
+
+  .slots {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 16px 0 8px;
+  }
+  .slot {
+    width: clamp(100px, 32vw, 140px);
+    height: clamp(100px, 32vw, 120px);
+    border-radius: 22px;
+    border: 4px dashed rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  }
+  .slot::before {
+    content: attr(data-num);
+    position: absolute;
+    top: 4px; left: 10px;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .slots.n3 { gap: 8px; }
+  .slots.n3 .slot { width: clamp(84px, 25vw, 120px); height: clamp(90px, 26vw, 110px); }
+  .slots.n3 .slot .tile { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+  .slots.n3 + .formed-word { font-size: clamp(2.2rem, 10vw, 3.4rem); }
+  .slot.hover { background: rgba(255, 210, 63, 0.25); border-color: var(--yellow); transform: scale(1.05); }
+  .slot.correct { border-style: solid; border-color: var(--green); background: rgba(62, 224, 143, 0.25); }
+  .slot.wrong { border-style: solid; border-color: var(--red); background: rgba(255, 77, 94, 0.25); animation: shake 0.5s ease; }
+
+  .pool {
+    min-height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 6px;
+    margin: 8px 0;
+    border-radius: 22px;
+    background: rgba(0, 0, 0, 0.22);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+  }
+  .pool-label { color: var(--muted); font-size: 1rem; margin-top: 10px; }
+
+  .tile {
+    width: clamp(78px, 23vw, 110px);
+    height: clamp(78px, 23vw, 100px);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.7rem, 7.5vw, 2.4rem);
+    font-weight: bold;
+    color: #24204f;
+    background: linear-gradient(180deg, #fff6c9, var(--yellow));
+    box-shadow: 0 7px 0 #c99a00, 0 12px 18px rgba(0, 0, 0, 0.35);
+    cursor: grab;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+    z-index: 2;
+  }
+  .tile:nth-child(3n+2) { background: linear-gradient(180deg, #d4f6ff, var(--cyan)); box-shadow: 0 7px 0 #1a95b3, 0 12px 18px rgba(0,0,0,.35); }
+  .tile:nth-child(3n+3) { background: linear-gradient(180deg, #ffd6e4, var(--pink)); box-shadow: 0 7px 0 #b8295a, 0 12px 18px rgba(0,0,0,.35); }
+  .slot .tile { width: 100%; height: 100%; transform: none !important; box-shadow: 0 4px 0 rgba(0,0,0,.25); font-size: clamp(2rem, 9vw, 2.6rem); cursor: pointer; }
+  .tile.rejected {
+    z-index: 50;
+    color: #fff;
+    background: linear-gradient(180deg, #ff9aa4, var(--red));
+    box-shadow: 0 7px 0 #8a0f22, 0 0 18px rgba(255, 77, 94, 0.8);
+  }
+  .tile.dragging {
+    position: fixed;
+    z-index: 100;
+    cursor: grabbing;
+    transform: scale(1.12) rotate(0deg) !important;
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.5);
+    transition: none;
+    margin: 0;
+  }
+  .tile.playing { animation: bump 0.5s ease; }
+  .tile-ghost { border-radius: 20px; border: 3px dashed rgba(255,255,255,.25); }
+
+  .formed-word {
+    font-size: clamp(2.6rem, 13vw, 4rem);
+    font-weight: bold;
+    color: var(--green);
+    text-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+    margin: 4px 0;
+    cursor: pointer;
+    letter-spacing: 2px;
+  }
+  .feedback { min-height: 1.6em; font-size: 1.2rem; font-weight: bold; margin: 4px 0; }
+  .feedback.ok { color: var(--green); }
+  .feedback.bad { color: #ffb4bd; }
+
+  /* ================= FASA 4: ROKET HALANGAN ================= */
+  .word-card {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    color: #24204f;
+    border-radius: 22px;
+    padding: 8px 26px 10px;
+    margin: 6px auto 10px;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    min-width: 170px;
+  }
+  .word-card .wc-icon { width: 58px; height: 58px; font-size: 3rem; line-height: 58px; display: flex; align-items: center; justify-content: center; }
+  .word-card .wc-word { font-size: clamp(2.2rem, 11vw, 3rem); font-weight: bold; letter-spacing: 1px; }
+
+  #scene {
+    position: relative;
+    width: 100%;
+    height: clamp(200px, 32vh, 300px);
+    border-radius: 22px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #0c78b8 0%, #064a80 80%, #d4b07a 80%, #b8925a 100%);
+    border: 3px solid rgba(255, 255, 255, 0.18);
+  }
+  .scene-stars {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 30px 40px, transparent 0 4px, rgba(255, 255, 255, 0.7) 4px 5.5px, transparent 6.5px),
+      radial-gradient(circle at 150px 100px, transparent 0 6px, rgba(255, 255, 255, 0.55) 6px 7.5px, transparent 8.5px),
+      radial-gradient(circle at 100px 160px, transparent 0 3px, rgba(255, 255, 255, 0.6) 3px 4.5px, transparent 5.5px),
+      radial-gradient(circle at 190px 30px, transparent 0 2px, rgba(255, 255, 255, 0.6) 2px 3.5px, transparent 4.5px);
+    background-size: 220px 220px;
+    background-repeat: repeat;
+    opacity: 0.9;
+  }
+  #scene.moving .scene-stars { animation: parallax 1.2s linear infinite; }
+  @keyframes parallax { from { background-position: 0 0; } to { background-position: -220px 0; } }
+
+  /* Halangan: dua batu karang dengan jaring di tengah */
+  #gate {
+    position: absolute;
+    left: 74%;
+    top: 0;
+    bottom: 0;
+    width: 36px;
+  }
+  .pillar {
+    position: absolute;
+    left: 0;
+    width: 36px;
+    height: 22%;
+    background:
+      radial-gradient(circle at 30% 30%, #ffc2cc 0 3px, transparent 4px) 0 0 / 12px 12px,
+      linear-gradient(180deg, #fb7185, #e11d48);
+    border: 3px solid #ffe4e6;
+    border-radius: 14px;
+  }
+  .pillar.top { top: -4px; }
+  .pillar.bottom { bottom: -4px; }
+  .beam {
+    position: absolute;
+    left: 7px;
+    width: 22px;
+    top: 22%;
+    bottom: 22%;
+    background:
+      repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.9) 0 2px, transparent 2px 9px),
+      repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.9) 0 2px, transparent 2px 9px);
+    border-left: 2px solid #e2e8f0;
+    border-right: 2px solid #e2e8f0;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
+    animation: netSway 1.6s ease-in-out infinite alternate;
+    transform-origin: 50% 0;
+    transition: transform 0.45s ease, opacity 0.45s ease;
+  }
+  @keyframes netSway { from { transform: skewX(-4deg); } to { transform: skewX(4deg); } }
+  #gate.open .beam { transform: scaleY(0); opacity: 0; animation: none; }
+  #gate.open .pillar { border-color: var(--green); }
+
+  .finish-line {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background: repeating-linear-gradient(180deg, #fff 0 12px, #222 12px 24px);
+    opacity: 0.55;
+  }
+
+  #rocketWrap {
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    width: clamp(78px, 20vw, 120px);
+    transform: translate(0, -50%);
+    z-index: 3;
+  }
+  #rocketWrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+  #rocketWrap .rocket-bob { animation: bob 1.2s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(-3px); } 50% { transform: translateY(3px); } }
+  #rocketWrap.crash .rocket-bob { animation: crashSpin 0.7s ease; }
+  @keyframes crashSpin {
+    0% { transform: rotate(0); }
+    30% { transform: rotate(-25deg) translateX(-10px); }
+    60% { transform: rotate(15deg) translateX(-18px); }
+    100% { transform: rotate(0) translateX(0); }
+  }
+  #boom {
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    font-size: 3.4rem;
+    transform: translateY(-50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #rocketWrap.crash #boom { animation: boom 0.8s ease forwards; }
+  @keyframes boom {
+    0% { transform: translateY(-50%) scale(0.2); opacity: 1; }
+    40% { transform: translateY(-50%) scale(1.5); opacity: 1; }
+    100% { transform: translateY(-50%) scale(1.8); opacity: 0; }
+  }
+  #scene.hit { animation: shake 0.5s ease; }
+
+  .status {
+    min-height: 1.6em;
+    font-size: 1.15rem;
+    font-weight: bold;
+    margin: 12px 0 4px;
+    color: var(--muted);
+  }
+  .status.ok { color: var(--green); }
+  .status.err { color: #ffb4bd; }
+  .status.listen { color: var(--yellow); }
+  .heard { min-height: 1.3em; color: #e4e8ff; font-size: 1rem; }
+
+  .warn {
+    background: rgba(255, 77, 94, 0.2);
+    border: 2px solid var(--red);
+    color: #ffd9dd;
+    border-radius: 16px;
+    padding: 12px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .mic-wrap { display: flex; flex-direction: column; align-items: center; margin: 10px 0 6px; }
+  .mic {
+    position: relative;
+    width: 136px;
+    height: 136px;
+    border-radius: 50%;
+    border: 6px solid #fff;
+    background: radial-gradient(circle at 35% 30%, #ff9aa4, var(--red) 60%, #b3122a);
+    color: #fff;
+    font-size: 3.6rem;
+    cursor: pointer;
+    box-shadow: 0 8px 0 #8a0f22, 0 14px 26px rgba(0, 0, 0, 0.45);
+    transition: transform 0.1s ease, filter 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mic:active { transform: translateY(6px); box-shadow: 0 2px 0 #8a0f22; }
+  .mic:disabled { filter: grayscale(1) brightness(0.7); cursor: not-allowed; }
+  .mic.listening { background: radial-gradient(circle at 35% 30%, #b6ffd6, var(--green) 60%, #12804a); box-shadow: 0 8px 0 #0d5e36, 0 14px 26px rgba(0,0,0,.45); }
+  .mic.listening::before, .mic.listening::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 4px solid var(--green);
+    animation: ring 1.2s ease-out infinite;
+  }
+  .mic.listening::after { animation-delay: 0.6s; }
+  @keyframes ring {
+    from { transform: scale(1); opacity: 0.9; }
+    to { transform: scale(1.6); opacity: 0; }
+  }
+  .mic-label { margin-top: 12px; font-size: 1.25rem; font-weight: bold; color: var(--yellow); }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  .score-big {
+    font-size: 1.8rem;
+    color: var(--yellow);
+    display: inline-block;
+  }
+  .stars-row { font-size: 1.4rem; letter-spacing: 2px; word-break: break-all; }
+
+  /* Tahniah */
+  .celebrate {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(5, 8, 30, 0.72);
+    overflow: hidden;
+  }
+  .celebrate-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(180deg, #2a1f78, #171046);
+    border: 4px solid var(--yellow);
+    border-radius: 30px;
+    padding: 26px 18px;
+    text-align: center;
+    animation: popIn 0.6s cubic-bezier(.2, 1.6, .4, 1);
+  }
+  .celebrate-title {
+    font-size: clamp(2.6rem, 13vw, 3.6rem);
+    font-weight: bold;
+    color: var(--yellow);
+    text-shadow: 0 4px 0 #b86a00;
+    animation: bump 1.2s ease infinite;
+  }
+  .celebrate-points { font-size: 2rem; color: var(--green); font-weight: bold; margin: 6px 0; }
+  .confetti {
+    position: absolute;
+    top: -40px;
+    font-size: 1.6rem;
+    animation: fall linear forwards;
+    z-index: 1;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(720deg); }
+  }
+
+  @media (max-width: 380px) {
+    .panel { padding: 18px 12px; border-radius: 22px; }
+    .btn { font-size: 1.2rem; padding: 14px 22px; }
+    .mic { width: 120px; height: 120px; font-size: 3.2rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fish, .fish2, .turtle-path, .turtle, .jelly, .seaweed, .rays, .star, .fin-tail, .prop { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= LATAR DASAR LAUT ================= -->
+<div id="space" aria-hidden="true">
+  <div class="rays"></div>
+  <div id="stars"></div>
+  <div class="sand"></div>
+
+  <div class="seaweed s1">
+    <svg viewBox="0 0 70 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22 300 Q2 220 24 150 Q42 80 20 0" stroke="#15803d" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <path d="M46 300 Q66 210 46 130 Q32 60 52 12" stroke="#22c55e" stroke-width="8" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="seaweed s2">
+    <svg viewBox="0 0 70 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M35 300 Q55 200 30 120 Q15 60 36 4" stroke="#16a34a" stroke-width="10" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="seaweed s3">
+    <svg viewBox="0 0 70 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M24 300 Q4 210 26 140 Q44 70 24 6" stroke="#22c55e" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M48 300 Q64 220 46 160 Q34 110 52 60" stroke="#15803d" stroke-width="8" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <svg class="coral" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M60 100 V60 M60 70 L40 42 M40 42 L34 20 M40 42 L52 24 M60 60 L82 36 M82 36 L78 14 M82 36 L98 26" stroke="#fb7185" stroke-width="9" stroke-linecap="round" fill="none"/>
+    <path d="M20 100 Q14 80 22 66 M22 66 L14 54 M22 66 L30 52" stroke="#f97316" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <circle cx="100" cy="88" r="10" fill="#fbbf24"/><circle cx="95" cy="84" r="3" fill="#fde68a"/>
+  </svg>
+
+  <div class="fish"><svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+      <path class="fin-tail" d="M22 30 L3 13 L7 30 L3 47 Z" fill="#f97316" stroke="#1f2937" stroke-width="2"/>
+      <path d="M44 12 Q55 0 68 12" fill="#f97316" stroke="#1f2937" stroke-width="2"/>
+      <ellipse cx="55" cy="30" rx="35" ry="19" fill="#f97316" stroke="#1f2937" stroke-width="2"/>
+      <path d="M40 13 Q47 30 40 47" stroke="#ffffff" stroke-width="7" fill="none"/>
+      <path d="M66 12 Q73 30 66 48" stroke="#ffffff" stroke-width="7" fill="none"/>
+      <circle cx="80" cy="25" r="4.5" fill="#fff"/><circle cx="81" cy="25" r="2.2" fill="#111"/>
+    </svg></div>
+  <div class="fish2"><svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+      <path class="fin-tail" d="M22 30 L3 13 L7 30 L3 47 Z" fill="#38bdf8" stroke="#1f2937" stroke-width="2"/>
+      <path d="M44 12 Q55 0 68 12" fill="#38bdf8" stroke="#1f2937" stroke-width="2"/>
+      <ellipse cx="55" cy="30" rx="35" ry="19" fill="#38bdf8" stroke="#1f2937" stroke-width="2"/>
+      <path d="M40 13 Q47 30 40 47" stroke="#fde047" stroke-width="7" fill="none"/>
+      <path d="M66 12 Q73 30 66 48" stroke="#fde047" stroke-width="7" fill="none"/>
+      <circle cx="80" cy="25" r="4.5" fill="#fff"/><circle cx="81" cy="25" r="2.2" fill="#111"/>
+    </svg></div>
+
+  <div class="turtle-path">
+    <div class="turtle">
+      <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+        <g fill="#4ade80">
+          <ellipse cx="82" cy="60" rx="17" ry="6" transform="rotate(30 82 60)"/>
+          <ellipse cx="30" cy="60" rx="12" ry="5" transform="rotate(-30 30 60)"/>
+          <ellipse cx="82" cy="20" rx="17" ry="6" transform="rotate(-30 82 20)"/>
+          <ellipse cx="30" cy="22" rx="12" ry="5" transform="rotate(30 30 22)"/>
+          <ellipse cx="102" cy="40" rx="13" ry="10"/>
+        </g>
+        <circle cx="108" cy="37" r="2.2" fill="#14532d"/>
+        <ellipse cx="56" cy="40" rx="36" ry="24" fill="#a16207" stroke="#713f12" stroke-width="3"/>
+        <g fill="#ca8a04"><circle cx="56" cy="40" r="8"/><circle cx="38" cy="32" r="6"/><circle cx="74" cy="32" r="6"/><circle cx="40" cy="50" r="6"/><circle cx="72" cy="50" r="6"/></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="jelly">
+    <svg viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 32 Q30 -8 54 32 Z" fill="#f9a8d4" opacity="0.9"/>
+      <g stroke="#f9a8d4" stroke-width="3" fill="none" stroke-linecap="round">
+        <path d="M14 32 Q10 46 16 58 Q20 68 14 78"/>
+        <path d="M26 32 Q22 48 28 60 Q32 70 26 78"/>
+        <path d="M36 32 Q40 48 34 60 Q30 70 36 78"/>
+        <path d="M46 32 Q50 46 44 58 Q40 68 46 78"/>
+      </g>
+      <circle cx="22" cy="20" r="3" fill="#fff" opacity="0.7"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ================= HUD ================= -->
+<header id="hud" class="hidden">
+  <div class="hud-player">🤿 <span id="hudNama">-</span> <small>(<span id="hudKelas">-</span>)</small></div>
+  <div class="score-badge" id="hudScore">⭐ <span id="hudScoreVal">0</span></div>
+</header>
+
+<main id="app">
+
+  <!-- ================= FASA 1: SKRIN MULA ================= -->
+  <section id="fasa1" class="phase active">
+    <div class="panel">
+      <div class="hero-icon">🐬</div>
+      <h1>Roda Pintar<br>Samudera</h1>
+      <p class="sub">Misi Suku Kata di Dasar Laut 🌊</p>
+      <form id="formMula" autocomplete="off" novalidate>
+        <div class="field">
+          <label for="inNama">Nama Saya</label>
+          <input id="inNama" type="text" maxlength="30" placeholder="Tulis nama anda" enterkeyhint="next">
+        </div>
+        <div class="field">
+          <label for="inKelas">Kelas Saya</label>
+          <input id="inKelas" type="text" maxlength="20" placeholder="Contoh: 1 Bestari" enterkeyhint="go">
+        </div>
+        <div class="error-msg" id="errMula"></div>
+        <button type="submit" class="btn green big wide" id="btnMula">🌊 Mula Bermain</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= FASA 2: RODA IMPIAN ================= -->
+  <section id="fasa2" class="phase">
+    <div class="panel">
+      <h2>🎡 Roda Impian</h2>
+      <p class="sub" id="wheelSub">Tekan butang <b>Putar</b> untuk mendapat perkataan!</p>
+      <div class="wheel-area" id="wheelArea">
+        <div class="wheel-pointer" id="wheelPointer"></div>
+        <canvas id="wheel"></canvas>
+      </div>
+      <div id="spinResult" class="hidden">
+        <div class="result-label">Perkataan anda ialah:</div>
+        <div class="result-card pop-in" id="resultCard" title="Dengar perkataan">
+          <div class="ri" id="resultIcon"></div>
+          <div class="rw" id="resultWord"></div>
+          <div style="font-size:1.6rem">🔊</div>
+        </div>
+      </div>
+      <button class="btn orange big" id="btnPutar">🌀 Putar</button>
+      <button class="btn green big hidden" id="btnSeterusnya">Seterusnya ➜</button>
+    </div>
+  </section>
+
+  <!-- ================= FASA 3: BINA PERKATAAN ================= -->
+  <section id="fasa3" class="phase">
+    <div class="panel">
+      <h2>🧩 Bina Perkataan</h2>
+      <p class="sub">Seret suku kata yang betul ke dalam kotak. Hati-hati, ada suku kata perangkap! Tekan suku kata untuk mendengar bunyinya.</p>
+      <div class="hint-icon" id="hintIcon" title="Dengar perkataan"></div>
+      <div class="slots" id="slots"></div>
+      <div class="formed-word hidden" id="formedWord" title="Dengar perkataan"></div>
+      <div class="feedback" id="feedback3"></div>
+      <div class="pool-label">Suku kata 👇</div>
+      <div class="pool" id="pool"></div>
+      <button class="btn pink big hidden" id="btnUji">🎤 Uji Sebutan</button>
+    </div>
+  </section>
+
+  <!-- ================= FASA 4: ROKET HALANGAN ================= -->
+  <section id="fasa4" class="phase">
+    <div class="panel">
+      <h2>🐠 Misi Sebutan</h2>
+      <div id="speechWarn" class="warn hidden"></div>
+
+      <div class="word-card invisible" id="wordCard" title="Dengar contoh sebutan">
+        <div class="wc-icon" id="wcIcon"></div>
+        <div class="wc-word" id="wcWord"></div>
+      </div>
+
+      <div id="scene">
+        <div class="scene-stars"></div>
+        <div class="finish-line"></div>
+        <div id="gate">
+          <div class="pillar top"></div>
+          <div class="beam"></div>
+          <div class="pillar bottom"></div>
+        </div>
+        <div id="rocketWrap">
+          <div class="rocket-bob">
+            <svg viewBox="0 0 130 70" xmlns="http://www.w3.org/2000/svg">
+              <ellipse class="prop" cx="11" cy="41" rx="4" ry="12" fill="#64748b"/>
+              <rect x="13" y="38" width="10" height="6" fill="#475569"/>
+              <path d="M26 27 L12 16 L32 25 Z" fill="#f97316"/>
+              <path d="M26 55 L12 66 L32 57 Z" fill="#f97316"/>
+              <path d="M76 10 V2 H90" stroke="#64748b" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <rect x="58" y="10" width="28" height="20" rx="7" fill="#eab308"/>
+              <rect x="20" y="24" width="98" height="34" rx="17" fill="#facc15"/>
+              <rect x="38" y="24" width="7" height="34" fill="#f97316"/>
+              <circle cx="58" cy="41" r="6.5" fill="#7dd3fc" stroke="#1e3a8a" stroke-width="3"/>
+              <circle cx="78" cy="41" r="6.5" fill="#7dd3fc" stroke="#1e3a8a" stroke-width="3"/>
+              <circle cx="98" cy="41" r="6.5" fill="#7dd3fc" stroke="#1e3a8a" stroke-width="3"/>
+              <circle cx="96" cy="38" r="2" fill="#fff"/>
+              <circle cx="124" cy="30" r="2.5" fill="#bae6fd" opacity="0.8"/>
+              <circle cx="126" cy="22" r="1.8" fill="#bae6fd" opacity="0.6"/>
+            </svg>
+          </div>
+          <div id="boom">💥</div>
+        </div>
+      </div>
+
+      <div class="status" id="speechStatus"></div>
+      <div class="heard" id="heard"></div>
+
+      <div class="mic-wrap">
+        <button class="mic" id="micBtn" aria-label="Tekan dan sebut" disabled>🎤</button>
+        <div class="mic-label" id="micLabel">Tekan &amp; Sebut</div>
+      </div>
+
+      <div class="score-row">
+        <span>Markah:</span>
+        <span class="score-big" id="score4">0</span>
+        <span class="stars-row" id="starsRow"></span>
+      </div>
+    </div>
+
+    <div class="celebrate hidden" id="celebrate">
+      <div class="celebrate-card">
+        <div class="celebrate-title">Tahniah! 🎉</div>
+        <div style="font-size:1.3rem" id="celebrateMsg">Sebutan anda betul!</div>
+        <div class="celebrate-points">+10 markah ⭐</div>
+        <div style="font-size:1.15rem;color:var(--muted)">Jumlah markah: <b id="celebrateTotal" style="color:var(--yellow)">0</b></div>
+        <button class="btn green big" id="btnMainSemula">🔄 Main Semula</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* =====================================================================
+   1) KONFIGURASI AUDIO  (SUNTING DI SINI)
+   ---------------------------------------------------------------------
+   Masukkan laluan fail audio (.m4a) anda sendiri untuk setiap suku kata dan
+   perkataan penuh. Kunci suku kata ditulis dalam huruf kecil, kunci
+   perkataan penuh ditulis dengan huruf besar di hadapan (contoh "Garpu").
+   Jika fail tiada, permainan tetap berjalan (cuma tiada bunyi).
+   ===================================================================== */
+const audioMap = {
+  // 1. Garpu
+  "gar": "audio/gar.m4a",
+  "pu": "audio/pu.m4a",
+  "Garpu": "audio/garpu_penuh.m4a",
+  // 2. Lembu
+  "lem": "audio/lem.m4a",
+  "bu": "audio/bu.m4a",
+  "Lembu": "audio/lembu_penuh.m4a",
+  // 3. Kunci
+  "kun": "audio/kun.m4a",
+  "ci": "audio/ci.m4a",
+  "Kunci": "audio/kunci_penuh.m4a",
+  // 4. Panda
+  "pan": "audio/pan.m4a",
+  "da": "audio/da.m4a",
+  "Panda": "audio/panda_penuh.m4a",
+  // 5. Timba
+  "tim": "audio/tim.m4a",
+  "ba": "audio/ba.m4a",
+  "Timba": "audio/timba_penuh.m4a",
+  // 6. Jambatan  ("ba" sudah ada di atas)
+  "jam": "audio/jam.m4a",
+  "tan": "audio/tan.m4a",
+  "Jambatan": "audio/jambatan_penuh.m4a",
+  // 7. Bintang
+  "bin": "audio/bin.m4a",
+  "tang": "audio/tang.m4a",
+  "Bintang": "audio/bintang_penuh.m4a",
+  // 8. Cincin
+  "cin": "audio/cin.m4a",
+  "Cincin": "audio/cincin_penuh.m4a",
+  // 9. Sampan  ("pan" sudah ada di atas)
+  "sam": "audio/sam.m4a",
+  "Sampan": "audio/sampan_penuh.m4a",
+  // 10. Rendang
+  "ren": "audio/ren.m4a",
+  "dang": "audio/dang.m4a",
+  "Rendang": "audio/rendang_penuh.m4a",
+  // 11. Biskut
+  "bis": "audio/bis.m4a",
+  "kut": "audio/kut.m4a",
+  "Biskut": "audio/biskut_penuh.m4a",
+  // 12. Tandas  ("tan" sudah ada di atas)
+  "das": "audio/das.m4a",
+  "Tandas": "audio/tandas_penuh.m4a",
+  // 13. Rumput
+  "rum": "audio/rum.m4a",
+  "put": "audio/put.m4a",
+  "Rumput": "audio/rumput_penuh.m4a",
+  // 14. Cangkul
+  "cang": "audio/cang.m4a",
+  "kul": "audio/kul.m4a",
+  "Cangkul": "audio/cangkul_penuh.m4a",
+  // 15. Dompet
+  "dom": "audio/dom.m4a",
+  "pet": "audio/pet.m4a",
+  "Dompet": "audio/dompet_penuh.m4a",
+  // 16. Pisang
+  "pi": "audio/pi.m4a",
+  "sang": "audio/sang.m4a",
+  "Pisang": "audio/pisang_penuh.m4a",
+  // 17. Sotong
+  "so": "audio/so.m4a",
+  "tong": "audio/tong.m4a",
+  "Sotong": "audio/sotong_penuh.m4a",
+  // 18. Payung
+  "pa": "audio/pa.m4a",
+  "yung": "audio/yung.m4a",
+  "Payung": "audio/payung_penuh.m4a",
+  // 19. Helang
+  "he": "audio/he.m4a",
+  "lang": "audio/lang.m4a",
+  "Helang": "audio/helang_penuh.m4a",
+  // 20. Jagung
+  "ja": "audio/ja.m4a",
+  "gung": "audio/gung.m4a",
+  "Jagung": "audio/jagung_penuh.m4a"
+};
+
+/* Kesan bunyi (pilihan). Biarkan null untuk menggunakan bunyi sintetik
+   terbina dalam, atau masukkan laluan .mp3 anda sendiri. */
+const sfxMap = {
+  berjaya: null,   // contoh: "audio/sfx_berjaya.mp3"
+  langgar: null,   // contoh: "audio/sfx_langgar.mp3"
+  salah: null,     // contoh: "audio/sfx_salah.mp3"
+  roda: null       // contoh: "audio/sfx_roda_berhenti.mp3"
+};
+
+/* =====================================================================
+   2) KONFIGURASI IKON / GAMBAR
+   ---------------------------------------------------------------------
+   Nilai boleh berupa emoji, kod <svg>, ATAU laluan fail gambar
+   (contoh "gambar/garpu.png") - laluan gambar akan dipaparkan sebagai <img>.
+   ===================================================================== */
+const iconMap = {
+  "Garpu": "🍴",
+  "Lembu": "🐄",
+  "Kunci": "🔑",
+  "Panda": "🐼",
+  "Timba": "🪣",
+  "Jambatan": "🌉",
+  "Bintang": "⭐",
+  "Cincin": "💍",
+  "Sampan": "🛶",
+  "Rendang": "🍛",
+  "Biskut": "🍪",
+  "Tandas": "🚽",
+  "Rumput": "🌿",
+  "Cangkul": '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M14 58 L46 14" stroke="#9a6233" stroke-width="6" stroke-linecap="round"/><path d="M40 8 L60 22 L54 32 L36 20 Z" fill="#94a3b8" stroke="#475569" stroke-width="2.5"/><circle cx="44" cy="17" r="3" fill="#475569"/></svg>',
+  "Dompet": "👛",
+  "Pisang": "🍌",
+  "Sotong": "🦑",
+  "Payung": "☂️",
+  "Helang": "🦅",
+  "Jagung": "🌽"
+};
+
+/* =====================================================================
+   3) SENARAI PERKATAAN & TETAPAN PERMAINAN
+   ===================================================================== */
+const SENARAI_PERKATAAN = [
+  { word: "Garpu",    syl: ["gar", "pu"] },
+  { word: "Lembu",    syl: ["lem", "bu"] },
+  { word: "Kunci",    syl: ["kun", "ci"] },
+  { word: "Panda",    syl: ["pan", "da"] },
+  { word: "Timba",    syl: ["tim", "ba"] },
+  { word: "Jambatan", syl: ["jam", "ba", "tan"] },
+  { word: "Bintang",  syl: ["bin", "tang"] },
+  { word: "Cincin",   syl: ["cin", "cin"] },
+  { word: "Sampan",   syl: ["sam", "pan"] },
+  { word: "Rendang",  syl: ["ren", "dang"] },
+  { word: "Biskut",   syl: ["bis", "kut"] },
+  { word: "Tandas",   syl: ["tan", "das"] },
+  { word: "Rumput",   syl: ["rum", "put"] },
+  { word: "Cangkul",  syl: ["cang", "kul"] },
+  { word: "Dompet",   syl: ["dom", "pet"] },
+  { word: "Pisang",   syl: ["pi", "sang"] },
+  { word: "Sotong",   syl: ["so", "tong"] },
+  { word: "Payung",   syl: ["pa", "yung"] },
+  { word: "Helang",   syl: ["he", "lang"] },
+  { word: "Jagung",   syl: ["ja", "gung"] }
+];
+
+/* Toleransi sebutan: jawapan diterima jika tahap persamaan (similarity)
+   >= nilai ini. Julat disyorkan: 0.75 (lebih bertoleransi) hingga 0.90
+   (lebih ketat). Sebutan yang tepat 100% sentiasa diterima. */
+const AMBANG_KETEPATAN = 0.75;
+const MARKAH_BETUL = 10;
+
+/* =====================================================================
+   KEADAAN PERMAINAN
+   ===================================================================== */
+const state = {
+  nama: "",
+  kelas: "",
+  score: 0,
+  current: null,      // perkataan semasa { word, syl }
+  lastIndex: -1,
+  rotation: 0,
+  spinning: false
+};
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+function mod(n, m) { return ((n % m) + m) % m; }
+function rand(a, b) { return a + Math.random() * (b - a); }
+function restartAnim(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+function renderIcon(el, word) {
+  const v = iconMap[word] || "⭐";
+  el.innerHTML = "";
+  if (v.trim().startsWith("<svg")) {
+    const d = document.createElement("div");
+    d.className = "icon-svg";
+    d.innerHTML = v;
+    el.appendChild(d);
+  } else if (/\.(png|jpe?g|gif|webp|svg)$/i.test(v)) {
+    const img = document.createElement("img");
+    img.className = "icon-img";
+    img.src = v;
+    img.alt = word;
+    el.appendChild(img);
+  } else {
+    el.textContent = v;
+  }
+}
+
+/* =====================================================================
+   AUDIO (fail .mp3 melalui objek Audio())
+   ===================================================================== */
+let currentAudio = null;
+
+function playAudio(key) {
+  const src = audioMap[key] || audioMap[String(key).toLowerCase()];
+  if (!src) { console.warn("Tiada fail audio dalam audioMap untuk:", key); return; }
+  try {
+    if (currentAudio) { currentAudio.pause(); }
+    currentAudio = new Audio(src);
+    const p = currentAudio.play();
+    if (p && p.catch) p.catch((err) => console.warn("Audio tidak dapat dimainkan:", src, err.message));
+  } catch (e) {
+    console.warn("Ralat audio:", e);
+  }
+}
+
+/* Kesan bunyi sintetik menggunakan Web Audio API (tiada fail luar diperlukan) */
+let actx = null;
+function getAudioCtx() {
+  if (!actx) {
+    const C = window.AudioContext || window.webkitAudioContext;
+    if (!C) return null;
+    actx = new C();
+  }
+  if (actx.state === "suspended") actx.resume();
+  return actx;
+}
+
+function tone(freq, start, dur, type = "sine", vol = 0.2, freqEnd = null) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const t0 = ctx.currentTime + start;
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t0);
+  if (freqEnd) osc.frequency.exponentialRampToValueAtTime(freqEnd, t0 + dur);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(vol, t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(g).connect(ctx.destination);
+  osc.start(t0);
+  osc.stop(t0 + dur + 0.05);
+}
+
+function noise(start, dur, vol = 0.4) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const t0 = ctx.currentTime + start;
+  const len = Math.floor(ctx.sampleRate * dur);
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const filt = ctx.createBiquadFilter();
+  filt.type = "lowpass";
+  filt.frequency.setValueAtTime(1800, t0);
+  filt.frequency.exponentialRampToValueAtTime(120, t0 + dur);
+  const g = ctx.createGain();
+  g.gain.value = vol;
+  src.connect(filt).connect(g).connect(ctx.destination);
+  src.start(t0);
+}
+
+function playSfxFile(name) {
+  if (!sfxMap[name]) return false;
+  try { const a = new Audio(sfxMap[name]); a.play().catch(() => {}); return true; } catch (e) { return false; }
+}
+
+const sfx = {
+  click()   { tone(660, 0, 0.08, "triangle", 0.15); },
+  tick()    { tone(1400, 0, 0.03, "square", 0.05); },
+  roda()    { if (playSfxFile("roda")) return; tone(784, 0, 0.15, "triangle", 0.2); tone(1047, 0.12, 0.3, "triangle", 0.2); },
+  pop()     { tone(500, 0, 0.1, "sine", 0.2, 900); },
+  salah()   { if (playSfxFile("salah")) return; tone(300, 0, 0.18, "sawtooth", 0.12); tone(220, 0.18, 0.3, "sawtooth", 0.12); },
+  berjaya() {
+    if (playSfxFile("berjaya")) return;
+    [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.11, 0.25, "triangle", 0.22));
+    tone(1319, 0.48, 0.5, "triangle", 0.18);
+  },
+  roket()   { noise(0, 1.0, 0.12); tone(180, 0, 1.0, "sawtooth", 0.05, 600); },
+  langgar() {
+    if (playSfxFile("langgar")) return;
+    noise(0, 0.7, 0.6);
+    tone(160, 0, 0.5, "sawtooth", 0.25, 40);
+  }
+};
+
+/* =====================================================================
+   LATAR BINTANG
+   ===================================================================== */
+(function buatBintang() {
+  const box = $("#stars");
+  const n = window.innerWidth < 600 ? 25 : 45;
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement("div");
+    s.className = "star";
+    const size = rand(5, 16);
+    s.style.width = s.style.height = size + "px";
+    s.style.left = rand(0, 100) + "%";
+    s.style.top = rand(0, 100) + "%";
+    s.style.animationDelay = rand(0, 12) + "s";
+    s.style.animationDuration = rand(8, 16) + "s";
+    frag.appendChild(s);
+  }
+  box.appendChild(frag);
+})();
+
+/* =====================================================================
+   PENGURUSAN FASA (sembunyi / papar div)
+   ===================================================================== */
+function showPhase(n) {
+  $$(".phase").forEach((p) => p.classList.toggle("active", p.id === "fasa" + n));
+  $("#hud").classList.toggle("hidden", n === 1);
+  window.scrollTo(0, 0);
+  if (n === 2) enterPhase2();
+  if (n === 3) enterPhase3();
+  if (n === 4) enterPhase4();
+}
+
+function updateScore(animate) {
+  $("#hudScoreVal").textContent = state.score;
+  $("#score4").textContent = state.score;
+  const n = Math.round(state.score / MARKAH_BETUL);
+  $("#starsRow").textContent = n > 10 ? "⭐".repeat(10) + " +" + (n - 10) : "⭐".repeat(n);
+  if (animate) {
+    restartAnim($("#hudScore"), "bump");
+    restartAnim($("#score4"), "bump");
+  }
+}
+
+/* =====================================================================
+   FASA 1: SKRIN MULA
+   ===================================================================== */
+$("#formMula").addEventListener("submit", (e) => {
+  e.preventDefault();
+  getAudioCtx();
+  const nama = $("#inNama").value.trim();
+  const kelas = $("#inKelas").value.trim();
+  const err = $("#errMula");
+  if (!nama || !kelas) {
+    err.textContent = !nama ? "Sila isi nama anda dahulu 😊" : "Sila isi kelas anda dahulu 😊";
+    restartAnim($("#fasa1 .panel"), "shake");
+    sfx.salah();
+    (!nama ? $("#inNama") : $("#inKelas")).focus();
+    return;
+  }
+  err.textContent = "";
+  state.nama = nama;
+  state.kelas = kelas;
+  $("#hudNama").textContent = nama;
+  $("#hudKelas").textContent = kelas;
+  updateScore(false);
+  sfx.click();
+  if (document.activeElement) document.activeElement.blur();
+  showPhase(2);
+});
+
+/* =====================================================================
+   FASA 2: RODA IMPIAN
+   ===================================================================== */
+const wheel = $("#wheel");
+const SEG = 360 / SENARAI_PERKATAAN.length;
+const WARNA_RODA = ["#ff5d8f", "#ff9f1c", "#f2c400", "#3ee08f", "#22c3e6", "#4f7cff", "#8b5cf6", "#e04fd0", "#ff6b4a", "#17b890"];
+
+function drawWheel() {
+  const area = $("#wheelArea");
+  const size = Math.floor(area.clientWidth);
+  if (!size) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  wheel.width = size * dpr;
+  wheel.height = size * dpr;
+  const ctx = wheel.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const r = size / 2;
+  const segRad = (SEG * Math.PI) / 180;
+  ctx.clearRect(0, 0, size, size);
+
+  SENARAI_PERKATAAN.forEach((item, i) => {
+    const a0 = -Math.PI / 2 + i * segRad;
+    const a1 = a0 + segRad;
+    ctx.beginPath();
+    ctx.moveTo(r, r);
+    ctx.arc(r, r, r - 8, a0, a1);
+    ctx.closePath();
+    ctx.fillStyle = WARNA_RODA[i % WARNA_RODA.length];
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(255,255,255,0.75)";
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(r, r);
+    ctx.rotate(a0 + segRad / 2);
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    const fs = Math.max(11, Math.round(size * 0.048));
+    ctx.font = `bold ${fs}px "Comic Sans MS", "Chalkboard SE", "Trebuchet MS", sans-serif`;
+    ctx.lineWidth = Math.max(2, fs * 0.22);
+    ctx.strokeStyle = "rgba(20,10,60,0.55)";
+    ctx.strokeText(item.word, r - 20, 1);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(item.word, r - 20, 1);
+    ctx.restore();
+  });
+
+  // Gelang luar
+  ctx.beginPath();
+  ctx.arc(r, r, r - 5, 0, Math.PI * 2);
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = "#ffd23f";
+  ctx.stroke();
+
+  // Lampu kecil di sempadan
+  for (let i = 0; i < SENARAI_PERKATAAN.length; i++) {
+    const a = -Math.PI / 2 + i * segRad;
+    ctx.beginPath();
+    ctx.arc(r + Math.cos(a) * (r - 5), r + Math.sin(a) * (r - 5), Math.max(2.5, size * 0.009), 0, Math.PI * 2);
+    ctx.fillStyle = i % 2 ? "#ffffff" : "#ff4d5e";
+    ctx.fill();
+  }
+
+  // Hab tengah
+  const hub = r * 0.17;
+  const grad = ctx.createRadialGradient(r - hub * 0.3, r - hub * 0.3, hub * 0.1, r, r, hub);
+  grad.addColorStop(0, "#fff6c9");
+  grad.addColorStop(1, "#ff9f1c");
+  ctx.beginPath();
+  ctx.arc(r, r, hub, 0, Math.PI * 2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "#ffffff";
+  ctx.stroke();
+  ctx.font = `${Math.round(hub * 1.1)}px sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("🐠", r, r + 2);
+}
+
+function enterPhase2() {
+  state.spinning = false;
+  $("#spinResult").classList.add("hidden");
+  $("#btnSeterusnya").classList.add("hidden");
+  const bp = $("#btnPutar");
+  bp.classList.remove("hidden");
+  bp.disabled = false;
+  $("#wheelSub").innerHTML = "Tekan butang <b>Putar</b> untuk mendapat perkataan!";
+  wheel.style.transition = "none";
+  wheel.style.transform = `rotate(${state.rotation}deg)`;
+  drawWheel();
+}
+
+function currentWheelAngle() {
+  const m = getComputedStyle(wheel).transform;
+  if (!m || m === "none") return 0;
+  const v = m.slice(m.indexOf("(") + 1, m.indexOf(")")).split(",").map(Number);
+  return mod((Math.atan2(v[1], v[0]) * 180) / Math.PI, 360);
+}
+
+function spinTicker() {
+  let lastSeg = Math.floor(currentWheelAngle() / SEG);
+  let lastTick = 0;
+  const pointer = $("#wheelPointer");
+  function loop(ts) {
+    if (!state.spinning) return;
+    const seg = Math.floor(currentWheelAngle() / SEG);
+    if (seg !== lastSeg && ts - lastTick > 45) {
+      lastSeg = seg;
+      lastTick = ts;
+      sfx.tick();
+      restartAnim(pointer, "tick");
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+function spin() {
+  if (state.spinning) return;
+  getAudioCtx();
+  state.spinning = true;
+  $("#btnPutar").disabled = true;
+  $("#spinResult").classList.add("hidden");
+  $("#wheelSub").textContent = "Roda sedang berputar... 🌀";
+
+  let idx;
+  do { idx = Math.floor(Math.random() * SENARAI_PERKATAAN.length); } while (idx === state.lastIndex);
+
+  // Pusat segmen idx (darjah, ikut arah jam dari atas). Penunjuk berada di atas.
+  const centre = (idx + 0.5) * SEG;
+  const jitter = (Math.random() - 0.5) * SEG * 0.6;
+  const delta = mod(-centre + jitter - state.rotation, 360);
+  const spins = 5 + Math.floor(Math.random() * 3);
+  state.rotation = state.rotation + spins * 360 + delta;
+
+  const DUR = 5200;
+  wheel.style.transition = `transform ${DUR}ms cubic-bezier(0.15, 0.7, 0.12, 1)`;
+  wheel.style.transform = `rotate(${state.rotation}deg)`;
+  spinTicker();
+  setTimeout(() => onSpinEnd(idx), DUR + 120);
+}
+
+function onSpinEnd(idx) {
+  state.spinning = false;
+  state.lastIndex = idx;
+  state.current = SENARAI_PERKATAAN[idx];
+  sfx.roda();
+  renderIcon($("#resultIcon"), state.current.word);
+  $("#resultWord").textContent = state.current.word;
+  $("#spinResult").classList.remove("hidden");
+  restartAnim($("#resultCard"), "pop-in");
+  $("#wheelSub").textContent = "Hebat! Tekan perkataan untuk mendengarnya 🔊";
+  $("#btnPutar").classList.add("hidden");
+  const bs = $("#btnSeterusnya");
+  bs.classList.remove("hidden");
+  restartAnim(bs, "pop-in");
+}
+
+$("#btnPutar").addEventListener("click", spin);
+$("#resultCard").addEventListener("click", () => state.current && playAudio(state.current.word));
+$("#btnSeterusnya").addEventListener("click", () => { sfx.click(); showPhase(3); });
+
+/* =====================================================================
+   FASA 3: BINA PERKATAAN (drag & drop dengan Pointer Events —
+   menyokong tetikus, skrin sentuh Android dan iPhone)
+   ===================================================================== */
+const slotsEl = $("#slots");
+const poolEl = $("#pool");
+const JUMLAH_DISTRAKTOR = 4; // bilangan suku kata pengganggu dari perkataan lain
+let phase3Locked = false;
+let drag = null;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* Pilih suku kata rawak daripada perkataan LAIN dalam senarai sebagai distraktor.
+   Suku kata yang sama dengan suku kata sasaran (cth "bu" dalam Buku/Burung) dikecualikan. */
+function pickDistractors(target, n) {
+  const exclude = new Set(target.syl);
+  const calon = new Set();
+  SENARAI_PERKATAAN.forEach((item) => {
+    if (item.word === target.word) return;
+    item.syl.forEach((s) => { if (!exclude.has(s)) calon.add(s); });
+  });
+  return shuffle(Array.from(calon)).slice(0, n);
+}
+
+function makeTile(syl) {
+  const t = document.createElement("div");
+  t.className = "tile";
+  t.textContent = syl;
+  t.dataset.syl = syl;
+  t.setAttribute("role", "button");
+  t.setAttribute("aria-label", "Suku kata " + syl);
+  t.addEventListener("pointerdown", onTileDown);
+  t.addEventListener("contextmenu", (e) => e.preventDefault());
+  return t;
+}
+
+function scatter(tile) {
+  tile.style.transform = `rotate(${rand(-12, 12).toFixed(1)}deg) translateY(${rand(-8, 8).toFixed(0)}px)`;
+}
+
+function enterPhase3() {
+  const w = state.current;
+  phase3Locked = false;
+  slotsEl.innerHTML = "";
+  slotsEl.className = "slots n" + w.syl.length;
+  poolEl.innerHTML = "";
+  $("#formedWord").classList.add("hidden");
+  $("#btnUji").classList.add("hidden");
+  setFeedback("", "");
+  renderIcon($("#hintIcon"), w.word);
+
+  w.syl.forEach((syl, i) => {
+    const s = document.createElement("div");
+    s.className = "slot";
+    s.dataset.index = i;
+    s.dataset.num = i + 1;
+    s.dataset.expect = syl; // kotak ini hanya menerima suku kata ini
+    slotsEl.appendChild(s);
+  });
+
+  // Suku kata sasaran + distraktor, disusun secara rawak
+  shuffle(w.syl.concat(pickDistractors(w, JUMLAH_DISTRAKTOR))).forEach((syl) => {
+    const t = makeTile(syl);
+    scatter(t);
+    poolEl.appendChild(t);
+  });
+}
+
+function setFeedback(text, cls) {
+  const f = $("#feedback3");
+  f.textContent = text;
+  f.className = "feedback " + (cls || "");
+}
+
+function onTileDown(e) {
+  if (drag) return;
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  e.preventDefault();
+  getAudioCtx();
+  const tile = e.currentTarget;
+  const rect = tile.getBoundingClientRect();
+  drag = {
+    tile,
+    id: e.pointerId,
+    startX: e.clientX,
+    startY: e.clientY,
+    offX: e.clientX - rect.left,
+    offY: e.clientY - rect.top,
+    w: rect.width,
+    h: rect.height,
+    moved: false,
+    // Jubin yang sudah betul dalam kotak jawapan (atau fasa sudah selesai)
+    // hanya boleh diketik untuk mendengar bunyi, tidak boleh diseret.
+    tapOnly: phase3Locked || tile.parentNode !== poolEl,
+    ghost: null
+  };
+  try { tile.setPointerCapture(e.pointerId); } catch (err) {}
+}
+
+function startDragVisual() {
+  const { tile, w, h } = drag;
+  const ghost = document.createElement("div");
+  ghost.className = "tile-ghost";
+  ghost.style.width = w + "px";
+  ghost.style.height = h + "px";
+  tile.parentNode.insertBefore(ghost, tile);
+  drag.ghost = ghost;
+  tile.classList.remove("rejected");
+  tile.style.transition = "";
+  tile.classList.add("dragging");
+  tile.style.width = w + "px";
+  tile.style.height = h + "px";
+  sfx.pop();
+}
+
+function slotUnder(x, y) {
+  // Pilih slot yang mengandungi titik tengah jubin (lebih mesra untuk jari kecil)
+  let best = null, bestDist = Infinity;
+  $$(".slot").forEach((s) => {
+    const r = s.getBoundingClientRect();
+    const pad = 24;
+    if (x >= r.left - pad && x <= r.right + pad && y >= r.top - pad && y <= r.bottom + pad) {
+      const d = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2));
+      if (d < bestDist) { bestDist = d; best = s; }
+    }
+  });
+  return best;
+}
+
+document.addEventListener("pointermove", (e) => {
+  if (!drag || e.pointerId !== drag.id || drag.tapOnly) return;
+  e.preventDefault();
+  const dx = e.clientX - drag.startX;
+  const dy = e.clientY - drag.startY;
+  if (!drag.moved && Math.hypot(dx, dy) > 8) {
+    drag.moved = true;
+    startDragVisual();
+  }
+  if (drag.moved) {
+    drag.tile.style.left = e.clientX - drag.offX + "px";
+    drag.tile.style.top = e.clientY - drag.offY + "px";
+    const cx = e.clientX - drag.offX + drag.w / 2;
+    const cy = e.clientY - drag.offY + drag.h / 2;
+    const target = slotUnder(cx, cy);
+    $$(".slot").forEach((s) => s.classList.toggle("hover", s === target));
+  }
+}, { passive: false });
+
+function endDrag(e, cancelled) {
+  if (!drag || e.pointerId !== drag.id) return;
+  const d = drag;
+  drag = null;
+  const tile = d.tile;
+  try { tile.releasePointerCapture(d.id); } catch (err) {}
+  $$(".slot").forEach((s) => s.classList.remove("hover"));
+
+  if (!d.moved) {
+    // Ketikan biasa: mainkan audio suku kata (termasuk distraktor)
+    if (!cancelled) {
+      playAudio(tile.dataset.syl);
+      restartAnim(tile, "playing");
+    }
+    return;
+  }
+
+  const cx = e.clientX - d.offX + d.w / 2;
+  const cy = e.clientY - d.offY + d.h / 2;
+  const target = cancelled ? null : slotUnder(cx, cy);
+  const dropRect = tile.getBoundingClientRect();
+
+  tile.classList.remove("dragging");
+  tile.style.left = tile.style.top = tile.style.width = tile.style.height = "";
+
+  if (target && slotAccepts(target, tile)) {
+    if (d.ghost) d.ghost.remove();
+    placeInSlot(tile, target);
+  } else {
+    bounceBack(tile, d.ghost, dropRect, !!target);
+    if (target) rejectFeedback(tile, target);
+  }
+}
+
+document.addEventListener("pointerup", (e) => endDrag(e, false));
+document.addEventListener("pointercancel", (e) => endDrag(e, true));
+
+/* Kotak jawapan hanya menerima suku kata yang betul bagi kedudukannya */
+function slotAccepts(slot, tile) {
+  return !slot.querySelector(".tile") && tile.dataset.syl === slot.dataset.expect;
+}
+
+/* Lantun jubin semula ke tempat asalnya dalam kotak pilihan */
+function bounceBack(tile, ghost, fromRect, isReject) {
+  if (ghost && ghost.parentNode) {
+    ghost.parentNode.insertBefore(tile, ghost);
+    ghost.remove();
+  } else {
+    poolEl.appendChild(tile);
+  }
+  scatter(tile);
+  const finalTransform = tile.style.transform;
+  const to = tile.getBoundingClientRect();
+  tile.style.transition = "none";
+  tile.style.transform = `translate(${fromRect.left - to.left}px, ${fromRect.top - to.top}px) ${finalTransform}`;
+  void tile.offsetWidth;
+  tile.style.transition = "transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
+  tile.style.transform = finalTransform;
+  if (isReject) {
+    restartAnim(tile, "rejected");
+    setTimeout(() => tile.classList.remove("rejected"), 900);
+  }
+  setTimeout(() => { tile.style.transition = ""; }, 520);
+}
+
+function rejectFeedback(tile, slot) {
+  const syl = tile.dataset.syl;
+  restartAnim(slot, "wrong");
+  setTimeout(() => slot.classList.remove("wrong"), 600);
+  sfx.salah();
+  if (state.current.syl.includes(syl)) {
+    setFeedback(`Hampir! “${syl}” betul, tetapi cuba letak di kotak lain. 😉`, "bad");
+  } else {
+    setFeedback(`Ups! “${syl}” bukan suku kata perkataan ini. Cuba lagi! 💪`, "bad");
+  }
+}
+
+function placeInSlot(tile, slot) {
+  tile.style.transform = "";
+  tile.style.transition = "";
+  slot.appendChild(tile);
+  slot.classList.add("correct");
+  sfx.click();
+  if (!checkWord()) {
+    playAudio(tile.dataset.syl);
+    setFeedback("Betul! 👍 Teruskan.", "ok");
+  }
+}
+
+function checkWord() {
+  const slots = $$(".slot");
+  const tiles = slots.map((s) => s.querySelector(".tile"));
+  if (tiles.some((t) => !t)) return false;
+
+  // Semua kotak telah diisi dengan suku kata yang betul
+  const built = tiles.map((t) => t.dataset.syl).join("");
+  phase3Locked = true;
+  // Huruf pertama perkataan lengkap ditukar kepada huruf besar secara automatik
+  tiles[0].textContent = capitalize(tiles[0].dataset.syl);
+  const fw = $("#formedWord");
+  fw.textContent = capitalize(built) + " 🔊";
+  fw.classList.remove("hidden");
+  restartAnim(fw, "pop-in");
+  setFeedback("Bagus! Anda berjaya membina perkataan! 🌟", "ok");
+  sfx.berjaya();
+  playAudio(state.current.word);
+  const bu = $("#btnUji");
+  bu.classList.remove("hidden");
+  restartAnim(bu, "pop-in");
+  return true;
+}
+
+$("#hintIcon").addEventListener("click", () => state.current && playAudio(state.current.word));
+$("#formedWord").addEventListener("click", () => state.current && playAudio(state.current.word));
+$("#btnUji").addEventListener("click", () => { sfx.click(); showPhase(4); });
+
+/* =====================================================================
+   PENGECAMAN SUARA & TOLERANSI SEBUTAN
+   ===================================================================== */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const MSG_TIADA_SOKONGAN = "Pelayar ini tidak menyokong pengecaman suara. Sila gunakan Google Chrome.";
+const MSG_MIKROFON = "Sila benarkan akses mikrofon untuk bermain permainan ini.";
+const MSG_TIADA_SUARA = "Tiada suara dikesan. Sila cuba lagi.";
+
+/* Jarak Levenshtein: bilangan minimum suntingan (tambah/buang/tukar huruf) */
+function levenshtein(a, b) {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+    }
+    prev = cur;
+  }
+  return prev[b.length];
+}
+
+/* Persamaan 0..1 (1 = sama sepenuhnya) */
+function similarity(a, b) {
+  const maxLen = Math.max(a.length, b.length);
+  if (!maxLen) return 1;
+  return 1 - levenshtein(a, b) / maxLen;
+}
+
+function normalise(s) {
+  return String(s)
+    .toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/* Bandingkan transkrip dengan sasaran. Semak keseluruhan ayat, setiap
+   perkataan, dan gabungan dua perkataan bersebelahan (cth "bu ku" -> "buku"). */
+function matchScore(transcript, target) {
+  const t = normalise(target).replace(/\s/g, "");
+  const n = normalise(transcript);
+  if (!n) return 0;
+  const tokens = n.split(" ");
+  const candidates = new Set([n.replace(/\s/g, ""), ...tokens]);
+  for (let i = 0; i < tokens.length - 1; i++) candidates.add(tokens[i] + tokens[i + 1]);
+  let best = 0;
+  candidates.forEach((c) => { best = Math.max(best, similarity(c, t)); });
+  return best;
+}
+
+/* =====================================================================
+   FASA 4: PERMAINAN SEBUTAN SUARA (ROKET HALANGAN)
+   ===================================================================== */
+const scene = $("#scene");
+const rocketWrap = $("#rocketWrap");
+const gate = $("#gate");
+const micBtn = $("#micBtn");
+const p4 = { arrived: false, busy: false, listening: false, rec: null, micGranted: false, timers: [] };
+
+function p4Later(fn, ms) { p4.timers.push(setTimeout(fn, ms)); }
+function clearP4Timers() { p4.timers.forEach(clearTimeout); p4.timers = []; }
+
+function sceneGeom() {
+  const W = scene.clientWidth;
+  const gateX = gate.offsetLeft;
+  const rw = rocketWrap.offsetWidth;
+  const startLeft = rocketWrap.offsetLeft;
+  return { W, gateX, rw, stopX: gateX - startLeft - rw - 14, hitX: gateX - startLeft - rw + 16 };
+}
+
+function setRocketX(x, dur, easing = "ease-out") {
+  rocketWrap.style.transition = dur ? `transform ${dur}s ${easing}` : "none";
+  rocketWrap.style.transform = `translate(${x}px, -50%)`;
+}
+
+function setStatus(text, cls) {
+  const s = $("#speechStatus");
+  s.textContent = text;
+  s.className = "status " + (cls || "");
+}
+
+function setMicEnabled(on) {
+  micBtn.disabled = !on || !SpeechRecognition;
+}
+
+function enterPhase4() {
+  clearP4Timers();
+  stopListening();
+  const w = state.current;
+  p4.arrived = false;
+  p4.busy = true;
+  $("#celebrate").classList.add("hidden");
+  renderIcon($("#wcIcon"), w.word);
+  $("#wcWord").textContent = w.word;
+  $("#wordCard").classList.add("invisible");
+  $("#heard").textContent = "";
+  gate.classList.remove("open");
+  rocketWrap.classList.remove("crash");
+  setMicEnabled(false);
+  updateScore(false);
+
+  const warn = $("#speechWarn");
+  if (!SpeechRecognition) {
+    warn.textContent = MSG_TIADA_SOKONGAN;
+    warn.classList.remove("hidden");
+  } else {
+    warn.classList.add("hidden");
+  }
+
+  setStatus("Kapal selam sedang menyelam... 🌊", "");
+  setRocketX(0, 0);
+  void rocketWrap.offsetWidth;
+  scene.classList.add("moving");
+  sfx.roket();
+  requestAnimationFrame(() => setRocketX(sceneGeom().stopX, 2.2));
+  p4Later(arriveAtGate, 2300);
+}
+
+function arriveAtGate() {
+  scene.classList.remove("moving");
+  p4.arrived = true;
+  p4.busy = false;
+  const card = $("#wordCard");
+  card.classList.remove("invisible");
+  restartAnim(card, "pop-in");
+  sfx.pop();
+  if (SpeechRecognition) {
+    setStatus("Halangan! Tekan butang 🎤 dan sebut perkataan di atas.", "listen");
+    setMicEnabled(true);
+  } else {
+    setStatus(MSG_TIADA_SOKONGAN, "err");
+  }
+}
+
+async function onMicPress() {
+  if (!SpeechRecognition) { setStatus(MSG_TIADA_SOKONGAN, "err"); return; }
+  if (p4.listening) { try { p4.rec && p4.rec.stop(); } catch (e) {} return; }
+  if (p4.busy || !p4.arrived) return;
+  getAudioCtx();
+  if (currentAudio) currentAudio.pause();
+
+  // Minta akses mikrofon (sekali sahaja)
+  if (!p4.micGranted) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setStatus(MSG_MIKROFON + " (Pastikan laman dibuka melalui https://)", "err");
+      return;
+    }
+    try {
+      setStatus("Meminta akses mikrofon...", "");
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((t) => t.stop()); // lepaskan supaya pengecaman suara boleh guna mikrofon
+      p4.micGranted = true;
+    } catch (err) {
+      setStatus(MSG_MIKROFON, "err");
+      return;
+    }
+  }
+  startListening();
+}
+
+function startListening() {
+  let rec;
+  try {
+    rec = new SpeechRecognition();
+  } catch (e) {
+    setStatus(MSG_TIADA_SOKONGAN, "err");
+    return;
+  }
+  rec.lang = "ms-MY";
+  rec.continuous = false;
+  rec.interimResults = false;
+  rec.maxAlternatives = 5;
+
+  let handled = false;
+  p4.rec = rec;
+
+  rec.onstart = () => {
+    p4.listening = true;
+    micBtn.classList.add("listening");
+    $("#micLabel").textContent = "Sedang mendengar...";
+    setStatus("🎧 Saya sedang mendengar... Sebut sekarang!", "listen");
+    $("#heard").textContent = "";
+  };
+
+  // Berhenti sebaik sahaja murid selesai bercakap
+  rec.onspeechend = () => { try { rec.stop(); } catch (e) {} };
+
+  rec.onresult = (event) => {
+    handled = true;
+    const alts = [];
+    for (let i = 0; i < event.results.length; i++) {
+      for (let j = 0; j < event.results[i].length; j++) {
+        alts.push(event.results[i][j].transcript);
+      }
+    }
+    evaluateSpeech(alts);
+  };
+
+  rec.onerror = (event) => {
+    handled = true;
+    switch (event.error) {
+      case "no-speech":
+        setStatus(MSG_TIADA_SUARA, "err");
+        break;
+      case "not-allowed":
+      case "service-not-allowed":
+        p4.micGranted = false;
+        setStatus(MSG_MIKROFON, "err");
+        break;
+      case "audio-capture":
+        setStatus("Mikrofon tidak dijumpai. Sila semak mikrofon anda.", "err");
+        break;
+      case "network":
+        setStatus("Masalah sambungan internet. Sila cuba lagi.", "err");
+        break;
+      case "language-not-supported":
+        setStatus("Bahasa Melayu tidak disokong pada peranti ini. Sila gunakan Google Chrome.", "err");
+        break;
+      case "aborted":
+        setStatus("Tekan butang 🎤 dan cuba lagi.", "");
+        break;
+      default:
+        setStatus("Ralat: " + event.error + ". Sila cuba lagi.", "err");
+    }
+  };
+
+  rec.onend = () => {
+    p4.listening = false;
+    p4.rec = null;
+    micBtn.classList.remove("listening");
+    $("#micLabel").textContent = "Tekan & Sebut";
+    if (!handled) setStatus(MSG_TIADA_SUARA, "err");
+  };
+
+  try {
+    rec.start();
+  } catch (e) {
+    setStatus("Tekan butang 🎤 sekali lagi untuk mula bercakap.", "err");
+  }
+}
+
+function stopListening() {
+  if (p4.rec) {
+    try { p4.rec.onend = null; p4.rec.abort(); } catch (e) {}
+  }
+  p4.rec = null;
+  p4.listening = false;
+  micBtn.classList.remove("listening");
+  $("#micLabel").textContent = "Tekan & Sebut";
+}
+
+function evaluateSpeech(alternatives) {
+  const target = state.current.word;
+  let best = 0, bestText = alternatives[0] || "";
+  alternatives.forEach((alt) => {
+    const sc = matchScore(alt, target);
+    if (sc > best) { best = sc; bestText = alt; }
+  });
+  const pct = Math.round(best * 100);
+  $("#heard").textContent = `Saya dengar: “${bestText.trim()}” • Ketepatan: ${pct}%`;
+
+  if (best >= AMBANG_KETEPATAN) {
+    onCorrect();
+  } else {
+    onWrong();
+  }
+}
+
+function onCorrect() {
+  p4.busy = true;
+  setMicEnabled(false);
+  setStatus("Betul! Halangan dibuka! 🎉", "ok");
+  gate.classList.add("open");
+  sfx.berjaya();
+  state.score += MARKAH_BETUL;
+  updateScore(true);
+
+  const g = sceneGeom();
+  p4Later(() => {
+    scene.classList.add("moving");
+    sfx.roket();
+    setRocketX(g.W + 60, 1.4, "ease-in");
+  }, 450);
+  p4Later(() => {
+    scene.classList.remove("moving");
+    showCelebration();
+  }, 1700);
+}
+
+function onWrong() {
+  p4.busy = true;
+  setMicEnabled(false);
+  setStatus("Alamak! Sebutan belum tepat...", "err");
+  const g = sceneGeom();
+  setRocketX(g.hitX, 0.35, "ease-in");
+  p4Later(() => {
+    sfx.langgar();
+    restartAnim(rocketWrap, "crash");
+    restartAnim(scene, "hit");
+  }, 330);
+  p4Later(() => {
+    rocketWrap.classList.remove("crash");
+    setRocketX(sceneGeom().stopX, 0.6);
+    setStatus("💥 Kapal selam tersangkut jaring! Tekan 🎤 dan cuba sebut sekali lagi.", "err");
+  }, 1150);
+  p4Later(() => {
+    p4.busy = false;
+    setMicEnabled(true);
+  }, 1750);
+}
+
+function showCelebration() {
+  const c = $("#celebrate");
+  $("#celebrateMsg").textContent = `Hebat, ${state.nama}! Sebutan “${state.current.word}” anda betul!`;
+  $("#celebrateTotal").textContent = state.score;
+  c.querySelectorAll(".confetti").forEach((x) => x.remove());
+  const bits = ["🐚", "🐠", "🎉", "🌟", "🐟", "⭐", "🎊"];
+  for (let i = 0; i < 36; i++) {
+    const s = document.createElement("span");
+    s.className = "confetti";
+    s.textContent = bits[i % bits.length];
+    s.style.left = rand(0, 100) + "%";
+    s.style.animationDuration = rand(2.2, 4.5) + "s";
+    s.style.animationDelay = rand(0, 1.2) + "s";
+    s.style.fontSize = rand(1.1, 2.2) + "rem";
+    c.appendChild(s);
+  }
+  c.classList.remove("hidden");
+}
+
+micBtn.addEventListener("click", onMicPress);
+$("#wordCard").addEventListener("click", () => {
+  if (!p4.listening && state.current) playAudio(state.current.word);
+});
+$("#btnMainSemula").addEventListener("click", () => {
+  sfx.click();
+  clearP4Timers();
+  stopListening();
+  $("#celebrate").classList.add("hidden");
+  showPhase(2);
+});
+
+/* =====================================================================
+   SAIZ SEMULA SKRIN
+   ===================================================================== */
+let resizeTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if ($("#fasa2").classList.contains("active")) drawWheel();
+    if ($("#fasa4").classList.contains("active") && p4.arrived && !p4.busy) {
+      setRocketX(sceneGeom().stopX, 0);
+    }
+  }, 150);
+});
+
+/* Amaran awal jika pelayar tidak menyokong pengecaman suara */
+if (!SpeechRecognition) console.warn(MSG_TIADA_SOKONGAN);
+</script>
+</body>
+</html>
