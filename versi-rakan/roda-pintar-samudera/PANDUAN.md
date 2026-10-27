@@ -8,6 +8,8 @@ Aliran permainan:
 3. **Bina Perkataan**: seret suku kata yang betul ke kotak jawapan. Ada 4 suku kata perangkap.
 4. **Misi Sebutan**: tekan butang 🎤 dan sebut perkataan itu. Sebutan yang betul memberi +10 markah.
 
+Pada pusingan pertama, pop-up panduan membantu murid baharu di setiap skrin.
+
 ---
 
 ## Langkah 1: Rakam audio
@@ -161,6 +163,11 @@ Perhatian semasa menyunting:
 - Setiap baris dalam senarai mesti diakhiri dengan **koma**, kecuali baris terakhir.
 - Jangan padam tanda `{ }`, `[ ]` atau `" "`.
 - Jika permainan tidak dapat dibuka selepas disunting, biasanya ada koma atau tanda petik yang tertinggal.
+
+### Tutorial pop-up
+Setiap murid baharu akan melihat 3 pop-up panduan pada pusingan pertama: satu di skrin Roda, satu di Bina Perkataan dan satu di Misi Sebutan. Murid boleh tekan **Teruskan** atau **Langkau**. Selepas "Main Semula", pop-up tidak muncul lagi.
+
+Teks pop-up boleh disunting dalam `const TUTORIAL` (cari dengan Ctrl+F). Setiap langkah ditulis sebagai `["ikon", "ayat"]`, dan `<b>...</b>` menjadikan tulisan tebal.
 
 ### Tetapan lain (pilihan)
 - `JUMLAH_DISTRAKTOR = 4`: bilangan suku kata perangkap di skrin Bina Perkataan.

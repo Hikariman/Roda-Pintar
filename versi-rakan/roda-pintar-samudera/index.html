@@ -776,6 +776,150 @@
     to { transform: translateY(110vh) rotate(720deg); }
   }
 
+  /* ================= TUTORIAL POP-UP ================= */
+  .tut-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(5, 8, 30, 0.75);
+    animation: phaseIn 0.3s ease;
+  }
+  .tut-card {
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    background: linear-gradient(180deg, #0e5a8f, #06294a);
+    border: 4px solid #67e8f9;
+    border-radius: 28px;
+    padding: 18px 18px 14px;
+    text-align: center;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    animation: popIn 0.45s cubic-bezier(.2, 1.6, .4, 1);
+  }
+  .tut-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--muted); font-size: 1rem; }
+  .tut-hello { font-weight: bold; color: var(--yellow); }
+  .tut-dots { display: flex; gap: 6px; }
+  .tut-dots span { width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 255, 255, 0.25); }
+  .tut-dots span.on { background: var(--yellow); }
+  .tut-card h3 { margin: 6px 0 8px; font-size: clamp(1.5rem, 6.5vw, 1.9rem); color: #fff; }
+  .tut-list { list-style: none; margin: 0 0 12px; padding: 0; text-align: left; }
+  .tut-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.15rem;
+    line-height: 1.35;
+    padding: 9px 12px;
+    margin-bottom: 8px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .tut-list .ti { font-size: 1.8rem; flex-shrink: 0; width: 38px; text-align: center; }
+  .tut-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .tut-actions .btn { margin: 4px 0; flex: 1 1 130px; font-size: 1.2rem; padding: 14px 10px; white-space: nowrap; }
+  .btn.ghost { background: rgba(255, 255, 255, 0.14); box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35); color: #fff; }
+  .btn.ghost:active { box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+
+  /* Kotak demo animasi */
+  .tut-demo {
+    position: relative;
+    height: 132px;
+    margin: 8px 0 4px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+  }
+  .d-hand { position: absolute; font-size: 2.4rem; line-height: 1; pointer-events: none; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5)); }
+
+  /* Demo 1: roda */
+  .d-wheel {
+    position: absolute; left: 22%; top: 50%;
+    width: 96px; height: 96px; margin: -48px 0 0 -48px;
+    border-radius: 50%;
+    border: 4px solid var(--yellow);
+    background: conic-gradient(#ff5d8f 0 45deg, #ff9f1c 0 90deg, #f2c400 0 135deg, #3ee08f 0 180deg, #22c3e6 0 225deg, #4f7cff 0 270deg, #8b5cf6 0 315deg, #e04fd0 0 360deg);
+    animation: dSpin 3s cubic-bezier(.15, .7, .12, 1) infinite;
+  }
+  .d-pointer {
+    position: absolute; left: 22%; top: 8px; margin-left: -10px;
+    border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 18px solid var(--red);
+  }
+  @keyframes dSpin { 0%, 15% { transform: rotate(0); } 85%, 100% { transform: rotate(1080deg); } }
+  .d-btn {
+    position: absolute; right: 12%; top: 50%; transform: translateY(-50%);
+    padding: 12px 18px; border-radius: 16px; font-weight: bold; font-size: 1.2rem;
+    background: linear-gradient(180deg, #ffc15c, var(--orange)); color: #3b2300;
+    box-shadow: 0 5px 0 #b86a00;
+    animation: dPress 3s ease infinite;
+  }
+  @keyframes dPress { 0%, 6% { transform: translateY(-50%); box-shadow: 0 5px 0 #b86a00; } 10% { transform: translateY(calc(-50% + 4px)); box-shadow: 0 1px 0 #b86a00; } 16%, 100% { transform: translateY(-50%); box-shadow: 0 5px 0 #b86a00; } }
+  .d-roda .d-hand { right: 10%; top: 62%; animation: dTap 3s ease infinite; }
+  @keyframes dTap { 0% { transform: translate(14px, 20px); opacity: 0; } 5% { opacity: 1; transform: translate(0, 0); } 10% { transform: translate(0, -6px) scale(0.9); } 18% { transform: translate(0, 0); opacity: 1; } 30%, 100% { opacity: 0; transform: translate(14px, 20px); } }
+
+  /* Demo 2: seret suku kata */
+  .d-slot {
+    position: absolute; top: 14px; width: 66px; height: 54px;
+    border: 3px dashed rgba(255, 255, 255, 0.6); border-radius: 14px;
+  }
+  .d-slot.s1 { left: calc(50% - 72px); }
+  .d-slot.s2 { left: calc(50% + 6px); }
+  .d-tile {
+    position: absolute; width: 62px; height: 50px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 1.4rem; color: #24204f;
+    background: linear-gradient(180deg, #fff6c9, var(--yellow));
+    box-shadow: 0 4px 0 #c99a00;
+  }
+  .d-tile.move { left: calc(50% - 100px); top: 74px; animation: dDrag 3.2s ease-in-out infinite; }
+  .d-tile.move .d-hand { right: -16px; bottom: -22px; font-size: 2rem; }
+  @keyframes dDrag {
+    0%, 15% { transform: translate(0, 0); }
+    55%, 80% { transform: translate(30px, -58px); }
+    81%, 100% { transform: translate(30px, -58px); opacity: 0; }
+  }
+  .d-tile.bad {
+    left: calc(50% + 40px); top: 74px;
+    background: linear-gradient(180deg, #ff9aa4, var(--red)); color: #fff; box-shadow: 0 4px 0 #8a0f22;
+    animation: dBad 3.2s ease infinite;
+  }
+  .d-tile.bad::after { content: "✖"; position: absolute; top: -12px; right: -10px; font-size: 1.1rem; background: #fff; color: var(--red); border-radius: 50%; width: 24px; height: 24px; line-height: 24px; text-align: center; }
+  @keyframes dBad { 0%, 40%, 100% { transform: translateX(0); } 45% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 55% { transform: translateX(-4px); } 60% { transform: translateX(4px); } }
+
+  /* Demo 3: mikrofon */
+  .d-mic {
+    position: absolute; left: 20%; top: 50%;
+    width: 70px; height: 70px; margin: -35px 0 0 -35px;
+    border-radius: 50%; border: 4px solid #fff;
+    background: radial-gradient(circle at 35% 30%, #ff9aa4, var(--red) 60%, #b3122a);
+    display: flex; align-items: center; justify-content: center; font-size: 2rem;
+  }
+  .d-mic::after {
+    content: ""; position: absolute; inset: -6px; border-radius: 50%;
+    border: 3px solid var(--green); animation: ring 1.2s ease-out infinite;
+  }
+  .d-mikrofon .d-hand { left: calc(20% + 6px); top: 58%; animation: dTap 3.2s ease infinite; }
+  .d-bubble {
+    position: absolute; left: calc(20% + 44px); top: 10px;
+    background: #fff; color: #24204f; font-weight: bold; font-size: 1.2rem;
+    padding: 6px 12px; border-radius: 14px 14px 14px 2px;
+    animation: dBubble 3.2s ease infinite;
+  }
+  @keyframes dBubble { 0%, 20% { opacity: 0; transform: scale(0.5); } 28%, 70% { opacity: 1; transform: scale(1); } 80%, 100% { opacity: 0; } }
+  .d-gate { position: absolute; right: 22%; top: 18px; bottom: 18px; width: 8px; border-radius: 4px; background: repeating-linear-gradient(45deg, rgba(255,255,255,.9) 0 2px, transparent 2px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,.9) 0 2px, transparent 2px 6px); box-shadow: none; width: 14px; border-radius: 2px; animation: dGate 3.2s ease infinite; }
+  @keyframes dGate { 0%, 45% { opacity: 1; transform: scaleY(1); } 55%, 90% { opacity: 0; transform: scaleY(0); } 100% { opacity: 1; transform: scaleY(1); } }
+  .d-rocket { position: absolute; left: 44%; top: 50%; margin-top: -22px; width: 70px; animation: dFly 3.2s ease-in infinite; }
+  .d-rocket svg { width: 100%; height: auto; display: block; }
+  @keyframes dFly { 0%, 50% { transform: translateX(0); opacity: 1; } 85% { transform: translateX(150px); opacity: 1; } 86%, 100% { transform: translateX(0); opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tut-demo * { animation: none !important; }
+  }
+
   @media (max-width: 380px) {
     .panel { padding: 18px 12px; border-radius: 22px; }
     .btn { font-size: 1.2rem; padding: 14px 22px; }
@@ -1003,6 +1147,23 @@
 
 </main>
 
+<!-- ================= TUTORIAL POP-UP (pusingan pertama sahaja) ================= -->
+<div id="tutorial" class="tut-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutTitle">
+  <div class="tut-card">
+    <div class="tut-top">
+      <span class="tut-hello" id="tutHello"></span>
+      <span class="tut-dots" id="tutDots"></span>
+    </div>
+    <div class="tut-demo" id="tutDemo"></div>
+    <h3 id="tutTitle"></h3>
+    <ul class="tut-list" id="tutList"></ul>
+    <div class="tut-actions">
+      <button class="btn ghost" id="tutSkip">⏭️ Langkau</button>
+      <button class="btn green" id="tutNext">Teruskan ➜</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =====================================================================
    1) KONFIGURASI AUDIO  (SUNTING DI SINI)
@@ -1163,6 +1324,45 @@ const AMBANG_KETEPATAN = 0.75;
 const MARKAH_BETUL = 10;
 
 /* =====================================================================
+   4) TUTORIAL POP-UP
+   ---------------------------------------------------------------------
+   Muncul pada pusingan pertama setiap murid baharu (selepas mengisi nama),
+   satu pop-up bagi setiap fasa. Teks boleh disunting di sini.
+   Setiap langkah: [ikon, ayat]. Gunakan <b>...</b> untuk tulisan tebal.
+   ===================================================================== */
+const TUTORIAL = {
+  2: {
+    title: "Putar Roda Impian 🎡",
+    demo: "roda",
+    steps: [
+      ["🌀", "Tekan butang <b>Putar</b>."],
+      ["🎯", "Roda akan berhenti pada <b>satu perkataan</b>."],
+      ["🔊", "Tekan perkataan itu untuk <b>mendengar</b> bunyinya."],
+      ["➜", "Tekan <b>Seterusnya</b> untuk bina perkataan."]
+    ]
+  },
+  3: {
+    title: "Bina Perkataan 🧩",
+    demo: "seret",
+    steps: [
+      ["👆", "Tekan suku kata untuk <b>mendengar</b> bunyinya."],
+      ["✋", "<b>Seret</b> suku kata yang betul ke dalam kotak, ikut susunan."],
+      ["⚠️", "Hati-hati! Ada suku kata <b>perangkap</b>. Yang salah akan melantun balik."]
+    ]
+  },
+  4: {
+    title: "Misi Sebutan 🎤",
+    demo: "mikrofon",
+    steps: [
+      ["🎤", "Tekan butang <b>mikrofon merah</b>."],
+      ["🗣️", "Sebut perkataan dengan <b>kuat dan jelas</b>."],
+      ["🌊", "Betul? Kapal selam melepasi jaring dan anda dapat <b>+10 markah</b>!"],
+      ["🔁", "Belum betul? Jangan risau, <b>cuba lagi</b>!"]
+    ]
+  }
+};
+
+/* =====================================================================
    KEADAAN PERMAINAN
    ===================================================================== */
 const state = {
@@ -1172,7 +1372,9 @@ const state = {
   current: null,      // perkataan semasa { word, syl }
   lastIndex: -1,
   rotation: 0,
-  spinning: false
+  spinning: false,
+  tutorial: false,    // true semasa pusingan pertama murid baharu
+  tutorialSeen: {}    // fasa yang tutorialnya sudah dipaparkan
 };
 
 const $ = (s) => document.querySelector(s);
@@ -1338,6 +1540,68 @@ function updateScore(animate) {
 }
 
 /* =====================================================================
+   TUTORIAL POP-UP
+   ===================================================================== */
+const tutEl = $("#tutorial");
+let tutOnClose = null;
+
+function tutDemoHTML(kind) {
+  const w = state.current;
+  if (kind === "roda") {
+    return '<div class="d-roda"><div class="d-wheel"></div><div class="d-pointer"></div><div class="d-btn">Putar</div><div class="d-hand">👆</div></div>';
+  }
+  if (kind === "seret") {
+    const first = w ? w.syl[0] : "bu";
+    const pool = $$("#pool .tile").map((t) => t.dataset.syl);
+    const bad = pool.find((x) => !w || !w.syl.includes(x)) || "pas";
+    return '<div class="d-seret"><div class="d-slot s1"></div><div class="d-slot s2"></div>' +
+      `<div class="d-tile bad">${bad}</div><div class="d-tile move">${first}<span class="d-hand">👆</span></div></div>`;
+  }
+  const word = w ? w.word : "Buku";
+  return `<div class="d-mikrofon"><div class="d-mic">🎤</div><div class="d-hand">👆</div><div class="d-bubble">“${word}!”</div><div class="d-gate"></div><div class="d-rocket"><svg viewBox="0 0 130 70" xmlns="http://www.w3.org/2000/svg"> <ellipse class="prop" cx="11" cy="41" rx="4" ry="12" fill="#64748b"/> <rect x="13" y="38" width="10" height="6" fill="#475569"/> <path d="M26 27 L12 16 L32 25 Z" fill="#f97316"/> <path d="M26 55 L12 66 L32 57 Z" fill="#f97316"/> <path d="M76 10 V2 H90" stroke="#64748b" stroke-width="4" fill="none" stroke-linecap="round"/> <rect x="58" y="10" width="28" height="20" rx="7" fill="#eab308"/> <rect x="20" y="24" width="98" height="34" rx="17" fill="#facc15"/> <rect x="38" y="24" width="7" height="34" fill="#f97316"/> <circle cx="58" cy="41" r="6.5" fill="#7dd3fc" stroke="#1e3a8a" stroke-width="3"/> <circle cx="78" cy="41" r="6.5" fill="#7dd3fc" stroke="#1e3a8a" stroke-width="3"/> <circle cx="98" cy="41" r="6.5" fill="#7dd3fc" stroke="#1e3a8a" stroke-width="3"/> <circle cx="96" cy="38" r="2" fill="#fff"/> <circle cx="124" cy="30" r="2.5" fill="#bae6fd" opacity="0.8"/> <circle cx="126" cy="22" r="1.8" fill="#bae6fd" opacity="0.6"/> </svg></div></div>`;
+}
+
+/* Papar tutorial bagi fasa n jika murid masih dalam pusingan pertama.
+   onClose dipanggil selepas pop-up ditutup (atau terus, jika tiada pop-up). */
+function showTutorial(n, onClose) {
+  const t = TUTORIAL[n];
+  if (!state.tutorial || state.tutorialSeen[n] || !t) { if (onClose) onClose(); return; }
+  state.tutorialSeen[n] = true;
+  tutOnClose = onClose || null;
+
+  const keys = Object.keys(TUTORIAL);
+  const pos = keys.indexOf(String(n));
+  $("#tutHello").textContent = pos === 0 ? `Hai ${state.nama}! 👋` : `Panduan ${pos + 1} / ${keys.length}`;
+  $("#tutDots").innerHTML = keys.map((_, i) => `<span class="${i === pos ? "on" : ""}"></span>`).join("");
+  $("#tutDemo").innerHTML = tutDemoHTML(t.demo);
+  $("#tutTitle").textContent = t.title;
+  $("#tutList").innerHTML = t.steps.map(([icon, text]) => `<li><span class="ti">${icon}</span><span>${text}</span></li>`).join("");
+  const last = pos === keys.length - 1;
+  $("#tutNext").textContent = last ? "Faham, mula! 👍" : "Teruskan ➜";
+  $("#tutSkip").classList.toggle("hidden", last); // tiada apa untuk dilangkau pada pop-up terakhir
+
+  tutEl.classList.remove("hidden");
+  sfx.pop();
+  setTimeout(() => $("#tutNext").focus(), 50);
+}
+
+function closeTutorial(skipAll) {
+  if (tutEl.classList.contains("hidden")) return;
+  if (skipAll) state.tutorial = false;
+  tutEl.classList.add("hidden");
+  sfx.click();
+  const cb = tutOnClose;
+  tutOnClose = null;
+  if (cb) cb();
+}
+
+$("#tutNext").addEventListener("click", () => closeTutorial(false));
+$("#tutSkip").addEventListener("click", () => closeTutorial(true));
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeTutorial(false);
+});
+
+/* =====================================================================
    FASA 1: SKRIN MULA
    ===================================================================== */
 $("#formMula").addEventListener("submit", (e) => {
@@ -1356,6 +1620,8 @@ $("#formMula").addEventListener("submit", (e) => {
   err.textContent = "";
   state.nama = nama;
   state.kelas = kelas;
+  state.tutorial = true;
+  state.tutorialSeen = {};
   $("#hudNama").textContent = nama;
   $("#hudKelas").textContent = kelas;
   updateScore(false);
@@ -1457,6 +1723,7 @@ function enterPhase2() {
   wheel.style.transition = "none";
   wheel.style.transform = `rotate(${state.rotation}deg)`;
   drawWheel();
+  showTutorial(2);
 }
 
 function currentWheelAngle() {
@@ -1602,6 +1869,7 @@ function enterPhase3() {
     scatter(t);
     poolEl.appendChild(t);
   });
+  showTutorial(3);
 }
 
 function setFeedback(text, cls) {
@@ -1937,6 +2205,7 @@ function arriveAtGate() {
   } else {
     setStatus(MSG_TIADA_SOKONGAN, "err");
   }
+  showTutorial(4);
 }
 
 async function onMicPress() {
@@ -2144,6 +2413,7 @@ $("#btnMainSemula").addEventListener("click", () => {
   clearP4Timers();
   stopListening();
   $("#celebrate").classList.add("hidden");
+  state.tutorial = false; // pusingan pertama selesai
   showPhase(2);
 });
 
