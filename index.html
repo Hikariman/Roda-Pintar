@@ -249,9 +249,50 @@
     padding: 22px 18px;
     text-align: center;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    position: relative;
   }
 
   h1, h2 { margin: 0 0 8px; line-height: 1.15; }
+
+  /* ---------- Butang arahan suara (untuk murid yang belum boleh membaca) ---------- */
+  .btn-arahan {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 54px;
+    height: 54px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: var(--cyan);
+    color: #10123a;
+    font-size: 1.7rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+    -webkit-tap-highlight-color: transparent;
+    z-index: 2;
+  }
+  .btn-arahan:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35); }
+  .btn-arahan::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 3px solid var(--cyan);
+    animation: arahanRing 2s ease-out infinite;
+    pointer-events: none;
+  }
+  .btn-arahan.playing { background: var(--yellow); }
+  .btn-arahan.playing::after { border-color: var(--yellow); animation-duration: 0.9s; }
+  .btn-arahan.missing { animation: shake 0.4s; }
+  @keyframes arahanRing {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+  .panel > h1, .panel > h2 { padding: 0 52px; }
+  .tut-card { position: relative; }
+  .tut-card .btn-arahan { position: static; width: 48px; height: 48px; font-size: 1.45rem; flex-shrink: 0; }
+
   h1 {
     font-size: clamp(2rem, 9vw, 3rem);
     background: linear-gradient(90deg, var(--yellow), var(--pink), var(--cyan));
@@ -974,6 +1015,7 @@
   <!-- ================= FASA 1: SKRIN MULA ================= -->
   <section id="fasa1" class="phase active">
     <div class="panel">
+      <button type="button" class="btn-arahan" data-arahan="fasa1" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
       <div class="hero-icon">🧑‍🚀</div>
       <h1>Roda Pintar</h1>
       <p class="sub">Misi Suku Kata di Angkasa Lepas 🚀</p>
@@ -995,6 +1037,7 @@
   <!-- ================= FASA 2: RODA IMPIAN ================= -->
   <section id="fasa2" class="phase">
     <div class="panel">
+      <button type="button" class="btn-arahan" data-arahan="fasa2" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
       <h2>🎡 Roda Impian</h2>
       <p class="sub" id="wheelSub">Tekan butang <b>Putar</b> untuk mendapat perkataan!</p>
       <div class="wheel-area" id="wheelArea">
@@ -1017,6 +1060,7 @@
   <!-- ================= FASA 3: BINA PERKATAAN ================= -->
   <section id="fasa3" class="phase">
     <div class="panel">
+      <button type="button" class="btn-arahan" data-arahan="fasa3" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
       <h2>🧩 Bina Perkataan</h2>
       <p class="sub">Seret suku kata yang betul ke dalam kotak. Hati-hati, ada suku kata perangkap! Tekan suku kata untuk mendengar bunyinya.</p>
       <div class="hint-icon" id="hintIcon" title="Dengar perkataan"></div>
@@ -1032,6 +1076,7 @@
   <!-- ================= FASA 4: ROKET HALANGAN ================= -->
   <section id="fasa4" class="phase">
     <div class="panel">
+      <button type="button" class="btn-arahan" data-arahan="fasa4" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
       <h2>🚀 Misi Sebutan</h2>
       <div id="speechWarn" class="warn hidden"></div>
 
@@ -1100,6 +1145,7 @@
     <div class="tut-top">
       <span class="tut-hello" id="tutHello"></span>
       <span class="tut-dots" id="tutDots"></span>
+      <button type="button" class="btn-arahan" id="tutArahan" data-arahan="tutorial2" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
     </div>
     <div class="tut-demo" id="tutDemo"></div>
     <h3 id="tutTitle"></h3>
@@ -1198,6 +1244,23 @@ const audioMap = {
   // 20. Burung  ("bu" sudah ada di atas)
   "rung": "audio/rung.m4a",
   "Burung": "audio/burung_penuh.m4a"
+};
+
+/* =====================================================================
+   1b) ARAHAN SUARA  (butang 🔊 bulat di penjuru kanan atas)
+   ---------------------------------------------------------------------
+   Untuk murid yang belum boleh membaca. Rakam arahan dengan suara
+   anda, namakan fail TEPAT seperti di bawah dan letak dalam folder
+   audio/. Jika fail belum ada, butang hanya bergoyang (tiada ralat).
+   ===================================================================== */
+const arahanMap = {
+  fasa1: "audio/arahan_fasa1.m4a",          // Skrin Mula (isi nama & kelas)
+  fasa2: "audio/arahan_fasa2.m4a",          // Roda Impian
+  fasa3: "audio/arahan_fasa3.m4a",          // Bina Perkataan
+  fasa4: "audio/arahan_fasa4.m4a",          // Misi Sebutan
+  tutorial2: "audio/arahan_tutorial2.m4a",  // Pop-up tutorial Roda Impian
+  tutorial3: "audio/arahan_tutorial3.m4a",  // Pop-up tutorial Bina Perkataan
+  tutorial4: "audio/arahan_tutorial4.m4a"   // Pop-up tutorial Misi Sebutan
 };
 
 /* Kesan bunyi (pilihan). Biarkan null untuk menggunakan bunyi sintetik
@@ -1360,6 +1423,7 @@ function playAudio(key) {
   const src = audioMap[key] || audioMap[String(key).toLowerCase()];
   if (!src) { console.warn("Tiada fail audio dalam audioMap untuk:", key); return; }
   try {
+    stopArahan();
     if (currentAudio) { currentAudio.pause(); }
     currentAudio = new Audio(src);
     const p = currentAudio.play();
@@ -1368,6 +1432,45 @@ function playAudio(key) {
     console.warn("Ralat audio:", e);
   }
 }
+
+/* Arahan suara: tekan sekali untuk dengar, tekan lagi untuk berhenti */
+let arahanAudio = null;
+let arahanBtn = null;
+
+function stopArahan() {
+  if (arahanAudio) { arahanAudio.pause(); arahanAudio = null; }
+  if (arahanBtn) { arahanBtn.classList.remove("playing"); arahanBtn = null; }
+}
+
+function arahanMissing(btn, src) {
+  console.warn("Fail arahan suara belum ada:", src);
+  if (arahanBtn === btn) stopArahan();
+  btn.classList.remove("missing");
+  void btn.offsetWidth;
+  btn.classList.add("missing");
+}
+
+function playArahan(btn) {
+  const key = btn.dataset.arahan;
+  if (arahanBtn === btn) { stopArahan(); return; }
+  stopArahan();
+  if (currentAudio) currentAudio.pause();
+  const src = arahanMap[key];
+  if (!src) { arahanMissing(btn, key); return; }
+  const a = new Audio(src);
+  arahanAudio = a;
+  arahanBtn = btn;
+  btn.classList.add("playing");
+  a.addEventListener("ended", () => { if (arahanAudio === a) stopArahan(); });
+  a.addEventListener("error", () => { if (arahanAudio === a) arahanMissing(btn, src); });
+  const p = a.play();
+  if (p && p.catch) p.catch((err) => { if (arahanAudio === a && err.name !== "AbortError") arahanMissing(btn, src); });
+}
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".btn-arahan");
+  if (btn) { e.preventDefault(); playArahan(btn); }
+});
 
 /* Kesan bunyi sintetik menggunakan Web Audio API (tiada fail luar diperlukan) */
 let actx = null;
@@ -1467,6 +1570,7 @@ const sfx = {
    PENGURUSAN FASA (sembunyi / papar div)
    ===================================================================== */
 function showPhase(n) {
+  stopArahan();
   $$(".phase").forEach((p) => p.classList.toggle("active", p.id === "fasa" + n));
   $("#hud").classList.toggle("hidden", n === 1);
   window.scrollTo(0, 0);
@@ -1515,6 +1619,8 @@ function showTutorial(n, onClose) {
   if (!state.tutorial || state.tutorialSeen[n] || !t) { if (onClose) onClose(); return; }
   state.tutorialSeen[n] = true;
   tutOnClose = onClose || null;
+  stopArahan();
+  $("#tutArahan").dataset.arahan = "tutorial" + n;
 
   const keys = Object.keys(TUTORIAL);
   const pos = keys.indexOf(String(n));
@@ -1535,6 +1641,7 @@ function showTutorial(n, onClose) {
 function closeTutorial(skipAll) {
   if (tutEl.classList.contains("hidden")) return;
   if (skipAll) state.tutorial = false;
+  stopArahan();
   tutEl.classList.add("hidden");
   sfx.click();
   const cb = tutOnClose;
@@ -2159,6 +2266,7 @@ async function onMicPress() {
   if (p4.listening) { try { p4.rec && p4.rec.stop(); } catch (e) {} return; }
   if (p4.busy || !p4.arrived) return;
   getAudioCtx();
+  stopArahan();
   if (currentAudio) currentAudio.pause();
 
   // Minta akses mikrofon (sekali sahaja)
