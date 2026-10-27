@@ -1015,7 +1015,7 @@
   <!-- ================= FASA 1: SKRIN MULA ================= -->
   <section id="fasa1" class="phase active">
     <div class="panel">
-      <button type="button" class="btn-arahan" data-arahan="fasa1" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
+      <button type="button" class="btn-arahan" data-arahan="panduan" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
       <div class="hero-icon">🧑‍🚀</div>
       <h1>Roda Pintar</h1>
       <p class="sub">Misi Suku Kata di Angkasa Lepas 🚀</p>
@@ -1037,7 +1037,6 @@
   <!-- ================= FASA 2: RODA IMPIAN ================= -->
   <section id="fasa2" class="phase">
     <div class="panel">
-      <button type="button" class="btn-arahan" data-arahan="fasa2" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
       <h2>🎡 Roda Impian</h2>
       <p class="sub" id="wheelSub">Tekan butang <b>Putar</b> untuk mendapat perkataan!</p>
       <div class="wheel-area" id="wheelArea">
@@ -1060,7 +1059,7 @@
   <!-- ================= FASA 3: BINA PERKATAAN ================= -->
   <section id="fasa3" class="phase">
     <div class="panel">
-      <button type="button" class="btn-arahan" data-arahan="fasa3" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
+      <button type="button" class="btn-arahan" data-arahan="gabung" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
       <h2>🧩 Bina Perkataan</h2>
       <p class="sub">Seret suku kata yang betul ke dalam kotak. Hati-hati, ada suku kata perangkap! Tekan suku kata untuk mendengar bunyinya.</p>
       <div class="hint-icon" id="hintIcon" title="Dengar perkataan"></div>
@@ -1076,7 +1075,7 @@
   <!-- ================= FASA 4: ROKET HALANGAN ================= -->
   <section id="fasa4" class="phase">
     <div class="panel">
-      <button type="button" class="btn-arahan" data-arahan="fasa4" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
+      <button type="button" class="btn-arahan" data-arahan="uji" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
       <h2>🚀 Misi Sebutan</h2>
       <div id="speechWarn" class="warn hidden"></div>
 
@@ -1145,7 +1144,7 @@
     <div class="tut-top">
       <span class="tut-hello" id="tutHello"></span>
       <span class="tut-dots" id="tutDots"></span>
-      <button type="button" class="btn-arahan" id="tutArahan" data-arahan="tutorial2" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
+      <button type="button" class="btn-arahan" id="tutArahan" data-arahan="panduan" aria-label="Dengar arahan" title="Dengar arahan">🔊</button>
     </div>
     <div class="tut-demo" id="tutDemo"></div>
     <h3 id="tutTitle"></h3>
@@ -1254,14 +1253,12 @@ const audioMap = {
    audio/. Jika fail belum ada, butang hanya bergoyang (tiada ralat).
    ===================================================================== */
 const arahanMap = {
-  fasa1: "audio/arahan_fasa1.m4a",          // Skrin Mula (isi nama & kelas)
-  fasa2: "audio/arahan_fasa2.m4a",          // Roda Impian
-  fasa3: "audio/arahan_fasa3.m4a",          // Bina Perkataan
-  fasa4: "audio/arahan_fasa4.m4a",          // Misi Sebutan
-  tutorial2: "audio/arahan_tutorial2.m4a",  // Pop-up tutorial Roda Impian
-  tutorial3: "audio/arahan_tutorial3.m4a",  // Pop-up tutorial Bina Perkataan
-  tutorial4: "audio/arahan_tutorial4.m4a"   // Pop-up tutorial Misi Sebutan
+  panduan: "audio/panduan_penggunaan.m4a",  // Skrin Mula + pop-up Roda Impian
+  gabung: "audio/gabung_suku_kata.m4a",     // Bina Perkataan + pop-up Bina Perkataan
+  uji: "audio/uji_rakaman_roket.m4a"        // Misi Sebutan + pop-up Misi Sebutan
 };
+/* Fail arahan yang dimainkan oleh butang 🔊 dalam pop-up tutorial setiap fasa */
+const arahanTutorial = { 2: "panduan", 3: "gabung", 4: "uji" };
 
 /* Kesan bunyi (pilihan). Biarkan null untuk menggunakan bunyi sintetik
    terbina dalam, atau masukkan laluan .mp3 anda sendiri. */
@@ -1620,7 +1617,7 @@ function showTutorial(n, onClose) {
   state.tutorialSeen[n] = true;
   tutOnClose = onClose || null;
   stopArahan();
-  $("#tutArahan").dataset.arahan = "tutorial" + n;
+  $("#tutArahan").dataset.arahan = arahanTutorial[n];
 
   const keys = Object.keys(TUTORIAL);
   const pos = keys.indexOf(String(n));

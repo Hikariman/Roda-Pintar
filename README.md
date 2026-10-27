@@ -14,18 +14,14 @@ Fail audio (format `.m4a`) berada dalam folder `audio/` dan sunting objek `audio
 Kesan bunyi juga boleh ditukar melalui `sfxMap`, dan ikon/gambar melalui `iconMap`.
 
 ## Arahan suara 🔊
-Butang bulat 🔊 di penjuru kanan atas setiap fasa dan pop-up tutorial memainkan arahan suara (untuk murid yang belum boleh membaca).
-Rakam dan muat naik fail ini ke folder `audio/` (nama mesti tepat, huruf kecil):
+Butang bulat 🔊 di penjuru kanan atas memainkan arahan suara (untuk murid yang belum boleh membaca).
+Muat naik fail ini ke folder `audio/` (nama mesti tepat, huruf kecil, tiada ruang):
 
 | Fail | Bila dimainkan |
 |---|---|
-| `arahan_fasa1.m4a` | Skrin Mula |
-| `arahan_fasa2.m4a` | Roda Impian |
-| `arahan_fasa3.m4a` | Bina Perkataan |
-| `arahan_fasa4.m4a` | Misi Sebutan |
-| `arahan_tutorial2.m4a` | Pop-up tutorial Roda Impian |
-| `arahan_tutorial3.m4a` | Pop-up tutorial Bina Perkataan |
-| `arahan_tutorial4.m4a` | Pop-up tutorial Misi Sebutan |
+| `panduan_penggunaan.m4a` | Skrin Mula + pop-up tutorial Roda Impian |
+| `gabung_suku_kata.m4a` | Bina Perkataan + pop-up tutorialnya |
+| `uji_rakaman_roket.m4a` | Misi Sebutan + pop-up tutorialnya |
 
 Laluan fail boleh diubah dalam objek `arahanMap` dalam `index.html`.
 
